@@ -22,7 +22,7 @@ def create_incidence():
     )
     db.session.add(new_incidence)
     db.session.commit()
-    return jsonify({"message": "Incidencia creada exitosamente!"}), 201
+    return jsonify({"message": "Incidencia creada"}), 201
 
 @app.route('/incidences', methods=['GET'])
 def get_incidences():
@@ -70,16 +70,21 @@ def update_incidence(id):
     if 'specialty' in data:
         incidence.specialty = data['specialty']
     db.session.commit()
-    return jsonify({"message": "Incidencia actualizada exitosamente"})
+    return jsonify({"message": "Incidencia actualizada"})
     
+    
+    
+@app.route('/incidences/<int:id>', methods=['DELETE'])
+def delete_incidence(id):
+    incidence = Incidence.query.get(id)
+    if not incidence:
+        return jsonify({"message": "Incidencia no encontrada"}), 404
+        db.session.delete(incidence)
+        db.session.commit()
+        return jsonify({"message": "Incidencia eliminada"})
 
 
-
-
-
-
-
-
-
-        })
-
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all() 
+    app.run(debug=True)
