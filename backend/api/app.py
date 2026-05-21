@@ -49,16 +49,16 @@ def get_incidence(id):
     if not incidence:
         return jsonify({"message": "Incidencia no encontrada"}), 404
 
-        return jsonify({
-
+    return jsonify({
         "id": incidence.id,
         "title": incidence.title,
         "description": incidence.description,
         "status": incidence.status,
         "tenant_id": incidence.tenant_id,
-        "property_id": incidence.property,
+        "property_id": incidence.property_id,
         "severity": incidence.severity,
-        "speciality": incidence.speciality })
+        "specialty": incidence.specialty
+    }), 200
 
 
 @app.route('/incidences/<int:id>', methods=['PUT'])
