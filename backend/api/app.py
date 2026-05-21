@@ -65,16 +65,20 @@ def get_incidence(id):
 def update_incidence(id):
     incidence = Incidence.query.get(id)
     if not incidence:
+
         return jsonify({"message": "Incidencia no encontrada"}), 404
-        data = request.get_json()
+    
+    data = request.get_json()
+
     if 'status' in data:
         incidence.status = data['status']
     if 'severity' in data:
         incidence.severity = data['severity']
     if 'specialty' in data:
         incidence.specialty = data['specialty']
+
     db.session.commit()
-    return jsonify({"message": "Incidencia actualizada"})
+    return jsonify({"message": "Incidencia actualizada"}), 200
     
     
     
@@ -82,10 +86,12 @@ def update_incidence(id):
 def delete_incidence(id):
     incidence = Incidence.query.get(id)
     if not incidence:
+
         return jsonify({"message": "Incidencia no encontrada"}), 404
-        db.session.delete(incidence)
-        db.session.commit()
-        return jsonify({"message": "Incidencia eliminada"})
+
+    db.session.delete(incidence)
+    db.session.commit()
+    return jsonify({"message": "Incidencia eliminada"}, 200
 
 
 if __name__ == '__main__':
