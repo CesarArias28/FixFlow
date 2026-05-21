@@ -91,7 +91,7 @@ def delete_incidence(id):
 
     db.session.delete(incidence)
     db.session.commit()
-    return jsonify({"message": "Incidencia eliminada"}, 200
+    return jsonify({"message": "Incidencia eliminada"}), 200
 
 
 if __name__ == '__main__':
