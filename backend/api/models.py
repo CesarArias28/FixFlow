@@ -27,3 +27,21 @@ class Incidence(db.Model):
       
     tenant_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
     property_id: Mapped[int] = mapped_column(ForeignKey('property.id'), nullable=False)
+
+    def __init__(
+        self,
+        title: str,
+        description: str,
+        tenant_id: int,
+        property_id: int,
+        status: str = "Pendiente",
+        severity: Optional[str] = None,
+        specialty: Optional[str] = None
+    ):
+        self.title = title
+        self.description = description
+        self.tenant_id = tenant_id
+        self.property_id = property_id
+        self.status = status
+        self.severity = severity
+        self.specialty = specialty
