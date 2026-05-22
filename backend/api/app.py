@@ -4,6 +4,8 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from api.models import db, User, Property, Incidence
 from api.commands import setup_commands
+from api.commands import setup_commands
+from api.admin import setup_admin
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///triage.db')
@@ -13,6 +15,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 migrate = Migrate(app, db)
 setup_commands(app)
+setup_admin(app)
 CORS(app)
 
 @app.route('/incidences', methods=['POST'])
