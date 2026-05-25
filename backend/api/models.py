@@ -27,6 +27,8 @@ class Incidence(db.Model):
       
     tenant_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
     property_id: Mapped[int] = mapped_column(ForeignKey('property.id'), nullable=False)
+    technician_id: Mapped[Optional[int]] = mapped_column(ForeignKey('user.id'), nullable=True)
+
 
     def __init__(
         self,
@@ -36,7 +38,9 @@ class Incidence(db.Model):
         property_id: int,
         status: str = "Pendiente",
         severity: Optional[str] = None,
-        specialty: Optional[str] = None
+        specialty: Optional[str] = None,
+        technician_id: Optional[int] = None
+
     ):
         self.title = title
         self.description = description
@@ -45,3 +49,4 @@ class Incidence(db.Model):
         self.status = status
         self.severity = severity
         self.specialty = specialty
+        self.technician_id = technician_id

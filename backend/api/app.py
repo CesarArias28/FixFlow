@@ -25,7 +25,8 @@ def create_incidence():
         title=data['title'], 
         description=data['description'],
         tenant_id=data['tenant_id'],
-        property_id=data['property_id']
+        property_id=data['property_id'],
+        technician_id=data.get('technician_id')
     )
     db.session.add(new_incidence)
     db.session.commit()
@@ -33,7 +34,13 @@ def create_incidence():
 
 @app.route('/incidences', methods=['GET'])
 def get_incidences():
-    incidences = Incidence.query.all()
+    
+    tech_id = request.args.get('technician_id')
+    if tech_id:
+        incidences = Incidence.query.filter_by(technician_id=tech_id).all()
+    else:
+        incidences = Incidence.query.all()
+
     incidences_list = [{
         "id": inc.id, 
         "title": inc.title, 
@@ -42,7 +49,8 @@ def get_incidences():
         "tenant_id": inc.tenant_id,
         "property_id": inc.property_id,
         "severity": inc.severity,
-        "specialty": inc.specialty
+        "specialty": inc.specialty,
+        "technician_id": inc.technician_id
         } for inc in incidences]
     return jsonify(incidences_list)
 
@@ -60,7 +68,8 @@ def get_incidence(id):
         "tenant_id": incidence.tenant_id,
         "property_id": incidence.property_id,
         "severity": incidence.severity,
-        "specialty": incidence.specialty
+        "specialty": incidence.specialty,
+        "technician_id": incidence.technician_id
     }), 200
 
 
@@ -79,6 +88,9 @@ def update_incidence(id):
         incidence.severity = data['severity']
     if 'specialty' in data:
         incidence.specialty = data['specialty']
+
+    if 'technician_id' in data:
+        incidence.technician_id = data['technician_id']
 
     db.session.commit()
     return jsonify({"message": "Incidencia actualizada"}), 200
