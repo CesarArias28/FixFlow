@@ -6,6 +6,12 @@ from api.models import db, User, Property, Incidence
 from api.commands import setup_commands
 from api.commands import setup_commands
 from api.admin import setup_admin
+from datetime import timedelta
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import decode_token
+from werkzeug.security import generate_password_hash
+import secrets 
+reset_token = secrets.token_urlsafe(32)
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///triage.db')
@@ -17,6 +23,84 @@ migrate = Migrate(app, db)
 setup_commands(app)
 setup_admin(app)
 CORS(app)
+
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "super-secret-key-change-it")
+jwt = JWTManager(app)
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get("email")
+    password = data.get("password")
+
+    if not email or not password:
+        return jsonify({"message": "Email y contraseña requeridos"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    
+    if not user or (user.password != password and not user.check_password(password)):
+        return jsonify({"message": "Credenciales inválidas"}), 401
+
+    if not user.is_active:
+        return jsonify({"message": "Usuario inactivo"}), 403
+
+    access_token = create_access_token(identity=str(user.id))
+    return jsonify({
+        "access_token": access_token,
+        "role": user.role,
+        "email": user.email,
+        "user_id": user.id
+    }), 200
+
+@app.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    data = request.get_json()
+    email = data.get("email")
+    if not email:
+        return jsonify({"message": "Email requerido"}), 400
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "Usuario no encontrado"}), 404
+
+    reset_token = create_access_token(
+    identity=str(user.id), 
+    expires_delta=timedelta(minutes=15))    
+
+    return jsonify({
+        "message": "Token de recuperación generado con éxito",
+        "reset_token": reset_token
+    }), 200
+
+
+
+@app.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.get_json()
+    token = data.get("token")
+    new_password = data.get("new_password")
+
+    if not token or not new_password:
+        return jsonify({"message": "Token y nueva contraseña requeridos"}), 400
+
+    try:
+        decoded_token = decode_token(token)
+        user_id = decoded_token.get("sub")
+    except Exception as e:
+        return jsonify({"message": "Token inválido o expirado"}), 400
+
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({"message": "Usuario no encontrado"}), 404
+
+    user.set_password(new_password)
+    db.session.commit()
+    return jsonify({"message": "Contraseña restablecida con éxito"}), 200
+
+
+
+
 
 @app.route('/incidences', methods=['POST'])
 def create_incidence():
