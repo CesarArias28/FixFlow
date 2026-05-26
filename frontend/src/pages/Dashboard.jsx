@@ -23,6 +23,7 @@ export const Dashboard = () => {
         } finally {
             setLoading(false);
         }
+    };
 
 
     const fetchTechnicians = async () => {
@@ -31,21 +32,22 @@ export const Dashboard = () => {
             const response = await fetch(`${backendUrl}/technicians`);
             if (response.ok) {
                 const data = await response.json();
-                setTechnicians(data);}
-                else {
-                    setError("No se encontro el tecnico");
-                }
+                setTechnicians(data);
+            }
+            else {
+                setError("No se encontro el tecnico");
+            }
 
-                } catch (err) {
-                    setError("Error de red al conectar el servidor.")
-                } finally {
-                    setLoading(false);
-                }       
-            };
+        } catch (err) {
+            setError("Error de red al conectar el servidor.")
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         if (backendUrl) {
-            fetchTechnicians(); fetchIncidences()      
+            fetchTechnicians(); fetchIncidences()
         } else {
             setError("La variable VITE_BACKEND_URL no está definida.");
         }
@@ -68,6 +70,26 @@ export const Dashboard = () => {
             }
         } catch (err) {
             alert("Error de red al intentar actualizar la incidencia.");
+        }
+    };
+
+    const handleAssignTechnician = async (incidenceId, technicianId) => {
+        try {
+            const response = await fetch(`${backendUrl}/incidences/${incidenceId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ "technician_id": technicianId ? parseInt(technicianId) : null })
+            });
+
+            if (response.ok) {
+                setIncidences(prev =>
+                    prev.map(inc => (inc.id === incidenceId ? { ...inc, technician_id: technicianId ? parseInt(technicianId) : null } : inc))
+                );
+            } else {
+                alert("Error al asignar el técnico en el servidor.");
+            }
+        } catch (err) {
+            alert("Error de red al intentar asignar el técnico.");
         }
     };
 
@@ -149,16 +171,30 @@ export const Dashboard = () => {
                                                     {inc.severity || "No asignado"}
                                                 </span>
                                             </div>
-                                            <div>
+                                            <div className="mb-2">
                                                 <span className="badge bg-dark px-2 py-1">
                                                     {inc.specialty || "No asignada"}
                                                 </span>
+                                            </div>
+                                            <div style={{ maxWidth: "160px" }} className="mx-auto">
+                                                <select
+                                                    className="form-select form-select-sm rounded-3"
+                                                    value={inc.technician_id || ""}
+                                                    onChange={(e) => handleAssignTechnician(inc.id, e.target.value)}
+                                                >
+                                                    <option value="">Sin asignar</option>
+                                                    {technicians.map((tech) => (
+                                                        <option key={tech.id} value={tech.id}>
+                                                            {tech.email}
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             </div>
                                         </td>
                                         <td className="text-center">
                                             <div className="d-flex gap-2 justify-content-center">
                                                 {inc.status === "Pendiente" && (
-                                                    <button 
+                                                    <button
                                                         className="btn btn-sm btn-info text-white rounded-pill px-3"
                                                         onClick={() => handleUpdateStatus(inc.id, "En progreso")}
                                                     >
@@ -166,7 +202,7 @@ export const Dashboard = () => {
                                                     </button>
                                                 )}
                                                 {inc.status !== "Resuelto" && (
-                                                    <button 
+                                                    <button
                                                         className="btn btn-sm btn-success rounded-pill px-3"
                                                         onClick={() => handleUpdateStatus(inc.id, "Resuelto")}
                                                     >
@@ -185,6 +221,5 @@ export const Dashboard = () => {
                     </div>
                 </div>
             )}
-        </div>
-    );
+        </div>)
 };

@@ -18,7 +18,6 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///triage.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-
 db.init_app(app)
 migrate = Migrate(app, db)
 setup_commands(app)
@@ -27,7 +26,6 @@ CORS(app)
 
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "super-secret-key-change-it")
 jwt = JWTManager(app)
-
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -67,10 +65,20 @@ def forgot_password():
     reset_token = create_access_token(
     identity=str(user.id), 
     expires_delta=timedelta(minutes=15))    
+    
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    reset_link = f"{frontend_url}/reset-password?token={reset_token}"
+
+    print("\n" + "="*50)
+    print(f"SIMULANDO ENVÍO DE EMAIL A: {email}")
+    print(f"Enlace de recuperación:\n{reset_link}")
+    print("="*50 + "\n")
+
 
     return jsonify({
-        "message": "Token de recuperación generado con éxito",
-        "reset_token": reset_token
+        "message": "Enlace de recuperación generado con éxito",
+        "reset_token": reset_token,
+        "reset_link": reset_link
     }), 200
 
 
