@@ -4,6 +4,7 @@ export const Dashboard = () => {
     const [incidences, setIncidences] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [technicians, setTechnicians] = useState([]);
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -22,11 +23,29 @@ export const Dashboard = () => {
         } finally {
             setLoading(false);
         }
-    };
+
+
+    const fetchTechnicians = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch(`${backendUrl}/technicians`);
+            if (response.ok) {
+                const data = await response.json();
+                setTechnicians(data);}
+                else {
+                    setError("No se encontro el tecnico");
+                }
+
+                } catch (err) {
+                    setError("Error de red al conectar el servidor.")
+                } finally {
+                    setLoading(false);
+                }       
+            };
 
     useEffect(() => {
         if (backendUrl) {
-            fetchIncidences();
+            fetchTechnicians(); fetchIncidences()      
         } else {
             setError("La variable VITE_BACKEND_URL no está definida.");
         }
