@@ -1,3 +1,4 @@
+from sqlalchemy.sql import roles
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -191,6 +192,18 @@ def delete_incidence(id):
     db.session.delete(incidence)
     db.session.commit()
     return jsonify({"message": "Incidencia eliminada"}), 200
+
+
+@app.route('/technicians', methods=['GET'])
+def get_technicians():
+    technicians = User.query.filter_by(role='tecnico').all()
+    technicians_list = [{
+        "id": tech.id,
+        "email": tech.email,
+        "role": tech.role,
+        "is_active": tech.is_active
+    } for tech in technicians]
+    return jsonify(technicians_list), 200
 
 
 if __name__ == '__main__':
