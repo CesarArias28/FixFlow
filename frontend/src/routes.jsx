@@ -10,6 +10,7 @@ import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
 import { Login } from "./pages/Login";
 import { ForgotPassword } from "./pages/ForgotPassword";
+import { TechnicianDashboard } from "./pages/TechnicianDashboard";
 import React from "react";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -42,6 +43,15 @@ export const router = createBrowserRouter(
           element={
               <ProtectedRoute allowedRoles={["administrador", "inmobiliaria"]}>
                   <Dashboard />
+              </ProtectedRoute>
+          } 
+      />
+
+       <Route 
+          path="/technician" 
+          element={
+              <ProtectedRoute allowedRoles={["tecnico"]}>
+                  <TechnicianDashboard />
               </ProtectedRoute>
           } 
       />
