@@ -3,7 +3,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
-from api.models import db, User, Property, Incidence
+from api.models import db, User, Property, Incidence, Asset
 from api.commands import setup_commands
 from api.commands import setup_commands
 from api.admin import setup_admin
