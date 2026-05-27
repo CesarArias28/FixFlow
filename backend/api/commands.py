@@ -1,6 +1,6 @@
 
 import click
-from api.models import db, User
+from api.models import db, User, Asset
 
 """
 In this file, you can add as many commands as you want using the @app.cli.command decorator
@@ -33,3 +33,22 @@ def setup_commands(app):
     @app.cli.command("insert-test-data")
     def insert_test_data():
         pass
+
+    @app.cli.command("insert-test-assets")
+    def insert_test_assets():
+        print("Creando activos de prueba...")
+        assets = [
+            {"name": "Caldera Central", "property_id": 1},
+            {"name": "Ascensor Principal", "property_id": 1},
+            {"name": "Puerta de Garaje", "property_id": 1},
+            {"name": "Aire Acondicionado Central", "property_id": 1},
+            {"name": "Bomba de Agua", "property_id": 1},
+        ]
+        for item in assets:
+            existing = Asset.query.filter_by(name=item["name"], property_id=item["property_id"]).first()
+            if not existing:
+                new_asset = Asset(name=item["name"], property_id=item["property_id"])
+                db.session.add(new_asset)
+                print(f"Activo '{item['name']}' creado.")
+        db.session.commit()
+        print("Creación de activos completada.")

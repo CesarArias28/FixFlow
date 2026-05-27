@@ -1,3 +1,4 @@
+from flask_sqlalchemy import query
 from sqlalchemy.sql import roles
 import os
 from flask import Flask, request, jsonify
@@ -119,7 +120,9 @@ def create_incidence():
         description=data['description'],
         tenant_id=data['tenant_id'],
         property_id=data['property_id'],
-        technician_id=data.get('technician_id')
+        technician_id=data.get('technician_id'),
+        asset_id=data.get('asset_id')
+
     )
     db.session.add(new_incidence)
     db.session.commit()
@@ -143,7 +146,9 @@ def get_incidences():
         "property_id": inc.property_id,
         "severity": inc.severity,
         "specialty": inc.specialty,
-        "technician_id": inc.technician_id
+        "technician_id": inc.technician_id,
+        "asset_id" : inc.asset_id,
+        "asset_name": inc.asset.name if inc.asset else None
         } for inc in incidences]
     return jsonify(incidences_list)
 
@@ -151,9 +156,11 @@ def get_incidences():
 def get_incidence(id):
     incidence = Incidence.query.get(id)
     if not incidence:
-        return jsonify({"message": "Incidencia no encontrada"}), 404
+
+     return jsonify({"message": "Incidencia no encontrada"}), 404
 
     return jsonify({
+            
         "id": incidence.id,
         "title": incidence.title,
         "description": incidence.description,
@@ -162,7 +169,9 @@ def get_incidence(id):
         "property_id": incidence.property_id,
         "severity": incidence.severity,
         "specialty": incidence.specialty,
-        "technician_id": incidence.technician_id
+        "technician_id": incidence.technician_id,
+        "asset_id": incidence.asset_id,
+        "asset_name": incidence.asset.name if incidence.asset else None
     }), 200
 
 
@@ -184,6 +193,10 @@ def update_incidence(id):
 
     if 'technician_id' in data:
         incidence.technician_id = data['technician_id']
+
+    if 'asset_id' in data:
+        incidence.asset_id = data ['asset_id']
+
 
     db.session.commit()
     return jsonify({"message": "Incidencia actualizada"}), 200
@@ -212,6 +225,37 @@ def get_technicians():
         "is_active": tech.is_active
     } for tech in technicians]
     return jsonify(technicians_list), 200
+
+@app.route('/assets', methods=['GET'])
+def get_assets():
+    property_id = request.args.get('property_id') 
+    if property_id:
+        assets = Asset.query.filter_by(property_id=property_id).all()
+    else:
+        assets = Asset.query.all()
+    assets_list = [{
+        "id": asset.id,
+        "name": asset.name,
+        "property_id": asset.property_id
+    } for asset in assets]
+    return jsonify(assets_list), 200
+
+
+@app.route('/assets', methods=['POST'])
+def create_asset():
+    data = request.get_json()
+    if not data or 'name' not in data or 'property_id' not in data:
+        return jsonify({"message": "Campos 'name' y 'property_id' requeridos"}), 400
+    
+    new_asset = Asset(
+        name=data['name'],
+        property_id=data['property_id']
+    )
+    db.session.add(new_asset)
+    db.session.commit()
+    return jsonify({"message": "Activo creado con éxito", "id": new_asset.id}), 201
+
+
 
 
 if __name__ == '__main__':
