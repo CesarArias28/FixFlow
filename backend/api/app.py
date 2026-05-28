@@ -2,7 +2,8 @@ from api.admin import IncidenceAdmin
 from flask_sqlalchemy import query
 from sqlalchemy.sql import roles
 import os
-from flask import Flask, request, jsonify
+import io
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from flask_migrate import Migrate
 from api.models import db, User, Property, Incidence, Asset
@@ -186,17 +187,92 @@ def download_incidence_pdf(id):
     if not incidence:
         return jsonify({"message": "Incidencia no encontrada"}), 404
 
-tenant = User.query.get(Incidence.tenant.id)
-prop = Property.query.get(Incidence.property_id)
-tech = User.query.get(Incidence.technician_id) if Incidence.technician_id else None
 
-buffer = io.BytesIO()
-doc = SimpleDocTemplate(buffer, pagesize=letter,
+    tenant = User.query.get(incidence.tenant_id)
+    prop = Property.query.get(incidence.property_id)
+    tech = User.query.get(incidence.technician_id) if incidence.technician_id else None
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter,
                             rightMargin=40, leftMargin=40,
                             topMargin=40, bottomMargin=40)
     
-styles = getSampleStyleSheet()
-story = []
+    styles = getSampleStyleSheet()
+    story = []
+
+    title_style = ParagraphStyle(
+        'PDFTitle',
+        parent=styles['Heading1'],
+        fontSize=22,
+        leading=26,
+        textColor=colors.HexColor('#0d6efd'),
+        spaceAfter=15
+    )
+    subtitle_style = ParagraphStyle(
+        'PDFSubTitle',
+        parent=styles['Normal'],
+        fontSize=11,
+        textColor=colors.HexColor('#6c757d'),
+        spaceAfter=20
+    )
+    label_style = ParagraphStyle(
+        'PDFLabel',
+        parent=styles['Normal'],
+        fontSize=10,
+        leading=14,
+        fontName='Helvetica-Bold',
+        textColor=colors.HexColor('#212529')
+    )
+    value_style = ParagraphStyle(
+        'PDFValue',
+        parent=styles['Normal'],
+        fontSize=10,
+        leading=14,
+        textColor=colors.HexColor('#495057')
+    )
+
+    story.append(Paragraph("FixFlow - Reporte de Incidencia", title_style))
+    story.append(Paragraph(f"Detalle formal de la avería registrada #{incidence.id}", subtitle_style))
+    story.append(Spacer(1, 10))
+
+    data = [
+        [Paragraph("Título de la Avería:", label_style), Paragraph(incidence.title, value_style)],
+        [Paragraph("Descripción:", label_style), Paragraph(incidence.description, value_style)],
+        [Paragraph("Estado Actual:", label_style), Paragraph(incidence.status, value_style)],
+        [Paragraph("Severidad:", label_style), Paragraph(incidence.severity or "No asignada", value_style)],
+        [Paragraph("Especialidad requerida:", label_style), Paragraph(incidence.specialty or "No asignada", value_style)],
+        [Paragraph("Dirección del Inmueble:", label_style), Paragraph(prop.address if prop else f"ID de propiedad: {incidence.property_id}", value_style)],
+        [Paragraph("Correo del Inquilino:", label_style), Paragraph(tenant.email if tenant else f"ID de inquilino: {incidence.tenant_id}", value_style)],
+        [Paragraph("Técnico Responsable:", label_style), Paragraph(tech.email if tech else "Sin técnico asignado", value_style)],
+        [Paragraph("Equipo / Activo afectado:", label_style), Paragraph(incidence.asset.name if incidence.asset else "No aplica", value_style)],
+    ]
+
+    table = Table(data, colWidths=[140, 360])
+    table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f8f9fa')),
+        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#e9ecef')),
+        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e9ecef')),
+        ('TOPPADDING', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+        ('LEFTPADDING', (0, 0), (-1, -1), 12),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 12),
+    ]))
+
+    story.append(table)
+    
+    doc.build(story)
+    
+    buffer.seek(0)
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"reporte_incidencia_{id}.pdf",
+        mimetype="application/pdf"
+    )
+
+
+
 
 
 @app.route('/incidences/<int:id>', methods=['PUT'])

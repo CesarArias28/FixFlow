@@ -138,8 +138,17 @@ export const TechnicianDashboard = () => {
                                                         Marcar como Resuelto
                                                     </button>
                                                 )}
-                                                {inc.status === "Resuelto" && (
-                                                    <span className="text-success fw-bold small">✓ Reparación completada</span>
+                                                                                                {inc.status === "Resuelto" && (
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        <span className="text-success fw-bold small">✓ Reparación completada</span>
+                                                        <button
+                                                            className="btn btn-sm btn-outline-danger rounded-pill px-3 py-1"
+                                                            style={{ fontSize: "0.8rem" }}
+                                                            onClick={() => window.open(`${backendUrl}/incidences/${inc.id}/pdf`, "_blank")}
+                                                        >
+                                                            Reporte PDF
+                                                        </button>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>

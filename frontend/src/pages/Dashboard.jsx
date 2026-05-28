@@ -250,8 +250,17 @@ export const Dashboard = () => {
                                                         Resolver
                                                     </button>
                                                 )}
-                                                {inc.status === "Resuelto" && (
-                                                    <span className="text-success small fw-bold">Completado</span>
+                                                                                                {inc.status === "Resuelto" && (
+                                                    <div className="d-flex flex-column align-items-center gap-1">
+                                                        <span className="text-success small fw-bold">Completado</span>
+                                                        <button
+                                                            className="btn btn-sm btn-outline-danger rounded-pill px-2 py-0"
+                                                            style={{ fontSize: "0.75rem" }}
+                                                            onClick={() => window.open(`${backendUrl}/incidences/${inc.id}/pdf`, "_blank")}
+                                                        >
+                                                            PDF
+                                                        </button>
+                                                    </div>
                                                 )}
                                             </div>
                                         </td>
