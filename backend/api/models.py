@@ -44,7 +44,7 @@ class Incidence(db.Model):
     severity: Mapped[Optional[str]] = mapped_column(db.String(20), nullable=True) 
     specialty: Mapped[Optional[str]] = mapped_column(db.String(50), nullable=True)
     asset_id: Mapped[Optional[int]] = mapped_column(ForeignKey('asset.id'), nullable=True)
-
+    asset = db.relationship('Asset', backref='incidences')
       
     tenant_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
     property_id: Mapped[int] = mapped_column(ForeignKey('property.id'), nullable=False)

@@ -105,8 +105,16 @@ export const Dashboard = () => {
                 return <span className="badge bg-secondary px-3 py-2 rounded-pill">{status}</span>;
         }
     };
-
-    return (
+    const assetIncidenceCounts = {};
+    incidences.forEach((inc) => {
+        if (inc.asset_id && inc.asset_name) {
+            assetIncidenceCounts[inc.asset_name] = (assetIncidenceCounts[inc.asset_name] || 0) + 1;
+        }
+    });
+    const criticalAssets = Object.keys(assetIncidenceCounts).filter(
+        (name) => assetIncidenceCounts[name] >= 3
+    );
+        return (
         <div className="container py-5">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
@@ -121,6 +129,27 @@ export const Dashboard = () => {
             {error && (
                 <div className="alert alert-danger" role="alert">
                     {error}
+                </div>
+            )}
+
+            {criticalAssets.length > 0 && (
+                <div className="alert alert-danger shadow-sm rounded-4 mb-4 border-0 p-4" role="alert">
+                    <div className="d-flex align-items-start">
+                        <span className="fs-3 me-3"></span>
+                        <div>
+                            <h5 className="alert-heading fw-bold mb-1">Mantenimiento Preventivo Requerido</h5>
+                            <p className="mb-0 small text-muted">
+                                Los siguientes activos han acumulado **3 o más averías** y requieren inspección técnica urgente o sustitución:
+                            </p>
+                            <ul className="mt-2 mb-0 fw-semibold text-danger small">
+                                {criticalAssets.map((name) => (
+                                    <li key={name}>
+                                        {name} ({assetIncidenceCounts[name]} averías registradas)
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             )}
 
@@ -152,9 +181,21 @@ export const Dashboard = () => {
                                 {incidences.map((inc) => (
                                     <tr key={inc.id}>
                                         <td className="fw-bold px-4">#{inc.id}</td>
-                                        <td>
+                                                                                <td>
                                             <div className="fw-bold">{inc.title}</div>
-                                            <small className="text-muted">Inmueble ID: {inc.property_id}</small>
+                                            <small className="text-muted d-block">Inmueble ID: {inc.property_id}</small>
+                                            {inc.asset_name && (
+                                                <div className="mt-1 d-flex align-items-center gap-2">
+                                                    <span className={`badge ${criticalAssets.includes(inc.asset_name) ? "bg-danger text-white" : "bg-light text-secondary"} px-2 py-1 rounded-pill small`}>
+                                                             {inc.asset_name}
+                                                    </span>
+                                                    {criticalAssets.includes(inc.asset_name) && (
+                                                        <span className="text-danger small fw-bold" style={{ fontSize: "0.75rem" }}>
+                                                             Crítico
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
                                         </td>
                                         <td>
                                             <p className="mb-0 text-truncate" style={{ maxWidth: "300px" }} title={inc.description}>
