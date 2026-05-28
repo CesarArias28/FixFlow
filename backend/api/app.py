@@ -1,3 +1,4 @@
+from api.admin import IncidenceAdmin
 from flask_sqlalchemy import query
 from sqlalchemy.sql import roles
 import os
@@ -5,6 +6,10 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
 from api.models import db, User, Property, Incidence, Asset
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
 from api.commands import setup_commands
 from api.commands import setup_commands
 from api.admin import setup_admin
@@ -12,7 +17,8 @@ from datetime import timedelta
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_jwt_extended import decode_token
 from werkzeug.security import generate_password_hash
-import secrets 
+import secrets
+
 reset_token = secrets.token_urlsafe(32)
 
 app = Flask(__name__)
@@ -160,7 +166,7 @@ def get_incidence(id):
      return jsonify({"message": "Incidencia no encontrada"}), 404
 
     return jsonify({
-            
+
         "id": incidence.id,
         "title": incidence.title,
         "description": incidence.description,
@@ -173,6 +179,24 @@ def get_incidence(id):
         "asset_id": incidence.asset_id,
         "asset_name": incidence.asset.name if incidence.asset else None
     }), 200
+
+@app.route('/incidences/<int:id>/pdf', methods=['GET'])
+def download_incidence_pdf(id):
+    incidence = Incidence.query.get(id)
+    if not incidence:
+        return jsonify({"message": "Incidencia no encontrada"}), 404
+
+tenant = User.query.get(Incidence.tenant.id)
+prop = Property.query.get(Incidence.property_id)
+tech = User.query.get(Incidence.technician_id) if Incidence.technician_id else None
+
+buffer = io.BytesIO()
+doc = SimpleDocTemplate(buffer, pagesize=letter,
+                            rightMargin=40, leftMargin=40,
+                            topMargin=40, bottomMargin=40)
+    
+styles = getSampleStyleSheet()
+story = []
 
 
 @app.route('/incidences/<int:id>', methods=['PUT'])
