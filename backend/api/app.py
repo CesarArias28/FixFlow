@@ -263,7 +263,7 @@ def download_incidence_pdf(id):
     
     doc.build(story)
     
-    buffer.seek(0)
+    buffer.seek(0)  
     return send_file(
         buffer,
         as_attachment=True,

@@ -14,6 +14,8 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(String(250), nullable=False)
     role: Mapped[str] = mapped_column(String(20), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), default=True, nullable=False)
+    phone_prefix: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    phone_number: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
