@@ -23,6 +23,8 @@ def setup_commands(app):
             user.email = "test_user" + str(x) + "@test.com"
             user.role = "inquilino"
             user.password = "123456"
+            user.phone_prefix = "+34" 
+            user.phone_number = f"60000000{x}"
             user.is_active = True
             db.session.add(user)
             db.session.commit()
