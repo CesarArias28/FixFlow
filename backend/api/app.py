@@ -120,22 +120,27 @@ def reset_password():
 
 
 @app.route('/incidences', methods=['POST'])
+@jwt_required()
 def create_incidence():
+    current_user_id = get_jwt_identity()
     data = request.get_json()
+    
+    tenant_id = data.get('tenant_id') or current_user_id
+
     new_incidence = Incidence(
         title=data['title'], 
         description=data['description'],
-        tenant_id=data['tenant_id'],
+        tenant_id=tenant_id,
         property_id=data['property_id'],
         technician_id=data.get('technician_id'),
         asset_id=data.get('asset_id')
-
     )
     db.session.add(new_incidence)
     db.session.commit()
     return jsonify({"message": "Incidencia creada"}), 201
 
 @app.route('/incidences', methods=['GET'])
+@jwt_required()
 def get_incidences():
     
     tech_id = request.args.get('technician_id')
@@ -160,6 +165,7 @@ def get_incidences():
     return jsonify(incidences_list)
 
 @app.route('/incidences/<int:id>', methods=['GET'])
+@jwt_required()
 def get_incidence(id):
     incidence = Incidence.query.get(id)
     if not incidence:
@@ -182,6 +188,7 @@ def get_incidence(id):
     }), 200
 
 @app.route('/incidences/<int:id>/pdf', methods=['GET'])
+@jwt_required()
 def download_incidence_pdf(id):
     incidence = Incidence.query.get(id)
     if not incidence:
@@ -276,6 +283,7 @@ def download_incidence_pdf(id):
 
 
 @app.route('/incidences/<int:id>', methods=['PUT'])
+@jwt_required()
 def update_incidence(id):
     incidence = Incidence.query.get(id)
     if not incidence:
@@ -314,6 +322,7 @@ def update_incidence(id):
     
     
 @app.route('/incidences/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_incidence(id):
     incidence = Incidence.query.get(id)
     if not incidence:
@@ -326,6 +335,7 @@ def delete_incidence(id):
 
 
 @app.route('/technicians', methods=['GET'])
+@jwt_required()
 def get_technicians():
     technicians = User.query.filter_by(role='tecnico').all()
     technicians_list = [{
@@ -337,6 +347,7 @@ def get_technicians():
     return jsonify(technicians_list), 200
 
 @app.route('/assets', methods=['GET'])
+@jwt_required()
 def get_assets():
     property_id = request.args.get('property_id') 
     if property_id:
@@ -352,6 +363,7 @@ def get_assets():
 
 
 @app.route('/assets', methods=['POST'])
+@jwt_required()
 def create_asset():
     data = request.get_json()
     if not data or 'name' not in data or 'property_id' not in data:
