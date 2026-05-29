@@ -283,6 +283,8 @@ def update_incidence(id):
         return jsonify({"message": "Incidencia no encontrada"}), 404
     
     data = request.get_json()
+    
+    old_status = incidence.status
 
     if 'status' in data:
         incidence.status = data['status']
@@ -299,6 +301,14 @@ def update_incidence(id):
 
 
     db.session.commit()
+
+    if old_status != incidence.status:
+        tenant = User.query.get(incidence.tenant_id)
+        if tenant and tenant.phone_number:
+            prefix = tenant.phone_prefix or ""
+            full_number = f"{prefix}{tenant.phone_number}"
+            send_whatsapp_notification(full_number, incidence.title, incidence.status)
+
     return jsonify({"message": "Incidencia actualizada"}), 200
     
     
