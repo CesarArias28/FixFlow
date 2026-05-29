@@ -15,8 +15,8 @@ from api.commands import setup_commands
 from api.commands import setup_commands
 from api.admin import setup_admin
 from datetime import timedelta
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from flask_jwt_extended import decode_token
+from api.services.twilio_service import send_whatsapp_notification
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
 from werkzeug.security import generate_password_hash
 import secrets
 
