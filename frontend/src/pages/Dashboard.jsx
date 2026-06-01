@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { apiClient } from "../apiClient";
 
 export const Dashboard = () => {
     const [incidences, setIncidences] = useState([]);
@@ -11,7 +12,7 @@ export const Dashboard = () => {
     const fetchIncidences = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${backendUrl}/incidences`);
+            const response = await apiClient("/incidences");
             if (response.ok) {
                 const data = await response.json();
                 setIncidences(data);
@@ -29,7 +30,7 @@ export const Dashboard = () => {
     const fetchTechnicians = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${backendUrl}/technicians`);
+            const response = await apiClient("/technicians");
             if (response.ok) {
                 const data = await response.json();
                 setTechnicians(data);
@@ -55,9 +56,8 @@ export const Dashboard = () => {
 
     const handleUpdateStatus = async (id, newStatus) => {
         try {
-            const response = await fetch(`${backendUrl}/incidences/${id}`, {
+            const response = await apiClient(`/incidences/${id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status: newStatus })
             });
 
@@ -75,9 +75,8 @@ export const Dashboard = () => {
 
     const handleAssignTechnician = async (incidenceId, technicianId) => {
         try {
-            const response = await fetch(`${backendUrl}/incidences/${incidenceId}`, {
+            const response = await apiClient(`/incidences/${incidenceId}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ "technician_id": technicianId ? parseInt(technicianId) : null })
             });
 
@@ -114,7 +113,7 @@ export const Dashboard = () => {
     const criticalAssets = Object.keys(assetIncidenceCounts).filter(
         (name) => assetIncidenceCounts[name] >= 3
     );
-        return (
+    return (
         <div className="container py-5">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
@@ -181,17 +180,17 @@ export const Dashboard = () => {
                                 {incidences.map((inc) => (
                                     <tr key={inc.id}>
                                         <td className="fw-bold px-4">#{inc.id}</td>
-                                                                                <td>
+                                        <td>
                                             <div className="fw-bold">{inc.title}</div>
                                             <small className="text-muted d-block">Inmueble ID: {inc.property_id}</small>
                                             {inc.asset_name && (
                                                 <div className="mt-1 d-flex align-items-center gap-2">
                                                     <span className={`badge ${criticalAssets.includes(inc.asset_name) ? "bg-danger text-white" : "bg-light text-secondary"} px-2 py-1 rounded-pill small`}>
-                                                             {inc.asset_name}
+                                                        {inc.asset_name}
                                                     </span>
                                                     {criticalAssets.includes(inc.asset_name) && (
                                                         <span className="text-danger small fw-bold" style={{ fontSize: "0.75rem" }}>
-                                                             Crítico
+                                                            Crítico
                                                         </span>
                                                     )}
                                                 </div>
@@ -250,7 +249,7 @@ export const Dashboard = () => {
                                                         Resolver
                                                     </button>
                                                 )}
-                                                                                                {inc.status === "Resuelto" && (
+                                                {inc.status === "Resuelto" && (
                                                     <div className="d-flex flex-column align-items-center gap-1">
                                                         <span className="text-success small fw-bold">Completado</span>
                                                         <button

@@ -1,8 +1,4 @@
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
-/**
- * Cliente API para centralizar las peticiones con JWT.
- * Se encarga de adjuntar automáticamente el token de autorización si existe.
- */
 export const apiClient = async (endpoint, options = {}) => {
     const token = localStorage.getItem("token");
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
+import { apiClient } from "../apiClient";
 
 export const TechnicianDashboard = () => {
     const { store } = useGlobalReducer();
@@ -14,14 +15,11 @@ export const TechnicianDashboard = () => {
         setLoading(true);
         setError("");
         try {
-            const response = await fetch(`${backendUrl}/incidences?technician_id=${techId}`, {
-                headers: {
-                    "Authorization": `Bearer ${store.token}`
-                }
-            });
+            const response = await apiClient(`/incidences?technician_id=${techId}`);
             if (response.ok) {
                 const data = await response.json();
                 setIncidences(data);
+
             } else {
                 setError("No se pudieron cargar las incidencias asignadas.");
             }
@@ -40,12 +38,8 @@ export const TechnicianDashboard = () => {
 
     const handleUpdateStatus = async (id, newStatus) => {
         try {
-            const response = await fetch(`${backendUrl}/incidences/${id}`, {
+            const response = await apiClient(`/incidences/${id}`, {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${store.token}`
-                },
                 body: JSON.stringify({ status: newStatus })
             });
 
@@ -138,7 +132,7 @@ export const TechnicianDashboard = () => {
                                                         Marcar como Resuelto
                                                     </button>
                                                 )}
-                                                                                                {inc.status === "Resuelto" && (
+                                                {inc.status === "Resuelto" && (
                                                     <div className="d-flex align-items-center gap-2">
                                                         <span className="text-success fw-bold small">✓ Reparación completada</span>
                                                         <button

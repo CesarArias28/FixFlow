@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiClient } from "../apiClient";
 export const IncidenceForm = () => {
 
     const navigate = useNavigate();
@@ -21,7 +22,7 @@ export const IncidenceForm = () => {
                 return;
             }
             try {
-                const response = await fetch(`${backendUrl}/assets?property_id=${propertyId}`);
+                const response = await apiClient(`/assets?property_id=${propertyId}`);
                 if (response.ok) {
                     const data = await response.json();
                     setAssets(data);
@@ -49,9 +50,8 @@ export const IncidenceForm = () => {
             return;
         }
         try {
-            const response = await fetch(`${backendUrl}/incidences`, {
+            const response = await apiClient("/incidences", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     title,
                     description,
