@@ -1,6 +1,8 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
+import { LogoFixFlow } from "./LogoFixFlow";
+import { Button } from "@/components/ui/button";
 
 export const Navbar = () => {
 	const { store, dispatch } = useGlobalReducer();
@@ -13,47 +15,45 @@ export const Navbar = () => {
 	};
 
 	return (
-		<nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
-			<div className="container">
-				<Link to="/" className="navbar-brand fw-bold text-gradient">
-					FixFlow
-				</Link>
+		<nav className="w-full border-b bg-background px-6 py-4 flex items-center justify-between shadow-sm">
+			<Link to="/">
+				<LogoFixFlow className="w-32 h-auto" />
+			</Link>
 
-				<div className="d-flex align-items-center gap-2">
-					{!store.token ? (
-						<Link to="/login" className="btn btn-primary rounded-pill px-4 bg-gradient border-0">
-							Iniciar Sesión
-						</Link>
-					) : (
-						<>
-							<span className="text-white-50 me-3 small">
-								{store.email}
-							</span>
+			<div className="flex items-center gap-4">
+				{!store.token ? (
+					<Button asChild className="rounded-full px-6">
+						<Link to="/login">Iniciar Sesión</Link>
+					</Button>
+				) : (
+					<>
+						<span className="text-muted-foreground text-sm mr-2">
+							{store.email}
+						</span>
 
-							{store.role === "tecnico" && (
-								<Link to="/technician" className="btn btn-outline-light rounded-pill px-3">
-									Portal Técnico
-								</Link>
-							)}
+						{store.role === "tecnico" && (
+							<Button asChild variant="outline" className="rounded-full">
+								<Link to="/technician">Portal Técnico</Link>
+							</Button>
+						)}
 
-							{store.role === "inquilino" && (
-								<Link to="/incidence/new" className="btn btn-outline-light rounded-pill px-3">
-									Reportar Avería
-								</Link>
-							)}
+						{store.role === "inquilino" && (
+							<Button asChild variant="outline" className="rounded-full">
+								<Link to="/incidence/new">Reportar Avería</Link>
+							</Button>
+						)}
 
-							{(store.role === "administrador" || store.role === "inmobiliaria") && (
-								<Link to="/dashboard" className="btn btn-outline-light rounded-pill px-3">
-									Panel Admin
-								</Link>
-							)}
+						{(store.role === "administrador" || store.role === "inmobiliaria") && (
+							<Button asChild variant="outline" className="rounded-full">
+								<Link to="/dashboard">Panel Admin</Link>
+							</Button>
+						)}
 
-							<button onClick={handleLogout} className="btn btn-danger rounded-pill px-3 bg-gradient border-0">
-								Cerrar Sesión
-							</button>
-						</>
-					)}
-				</div>
+						<Button onClick={handleLogout} variant="destructive" className="rounded-full px-5">
+							Cerrar Sesión
+						</Button>
+					</>
+				)}
 			</div>
 		</nav>
 	);
