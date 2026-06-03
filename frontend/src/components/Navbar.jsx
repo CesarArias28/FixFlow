@@ -35,7 +35,7 @@ export const Navbar = () => {
         }
 
         return (
-            <Link to={path} className="ml-4 px-3 py-1 text-xs font-medium rounded-full bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-zinc-200 transition-colors hidden sm:block">
+            <Link to={path} className="ml-4 px-3 py-1 text-xs font-semibold rounded-full bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 transition-colors hidden sm:block">
                 {label}
             </Link>
         );
