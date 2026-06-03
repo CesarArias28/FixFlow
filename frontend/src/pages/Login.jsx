@@ -70,7 +70,7 @@ export const Login = () => {
                     <CardTitle className="text-2xl font-bold">FixFlow Acceso</CardTitle>
                     <CardDescription>Ingresa tus credenciales para continuar</CardDescription>
                 </CardHeader>
-                
+
                 <CardContent>
                     {error && (
                         <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md mb-4 text-center font-medium">

@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../apiClient";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 export const IncidenceForm = () => {
 
     const navigate = useNavigate();
@@ -78,109 +84,92 @@ export const IncidenceForm = () => {
         }
     };
     return (
-        <div className="container py-5">
-            <div className="row justify-content-center">
-                <div className="col-md-8 col-lg-6">
-                    <div className="card shadow-lg border-0 rounded-4">
-                        <div className="card-header bg-gradient bg-primary text-white text-center py-4 border-0 rounded-top-4">
-                            <h3 className="mb-0 fw-bold">Reportar Nueva Avería</h3>
-                            <p className="mb-0 text-white-50">FixFlow - Canal de Atención Directo</p>
+        <div className="min-h-screen flex items-center justify-center p-4 py-12">
+            <Card className="w-full max-w-2xl shadow-lg border-0">
+                <CardHeader className="text-center bg-primary text-primary-foreground rounded-t-lg mb-6">
+                    <CardTitle className="text-2xl">Reportar Nueva Avería</CardTitle>
+                    <CardDescription className="text-primary-foreground/80">FixFlow - Canal de Atención Directo</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {statusMsg.text && (
+                        <div className={`alert alert-${statusMsg.type} alert-dismissible fade show`} role="alert">
+                            {statusMsg.text}
                         </div>
-                        <div className="card-body p-4">
-                            {statusMsg.text && (
-                                <div className={`alert alert-${statusMsg.type} alert-dismissible fade show`} role="alert">
-                                    {statusMsg.text}
-                                </div>
-                            )}
-                            <form onSubmit={handleSubmit}>
-                                <div className="mb-3">
-                                    <label htmlFor="title" className="form-label fw-semibold">Título de la Avería</label>
-                                    <input
-                                        type="text"
-                                        className="form-control form-control-lg rounded-3"
-                                        id="title"
-                                        placeholder="Ej. Fuga de agua en cocina"
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="description" className="form-label fw-semibold">Descripción del Problema</label>
-                                    <textarea
-                                        className="form-control rounded-3"
-                                        id="description"
-                                        rows="4"
-                                        placeholder="Detalla lo que ocurre para que podamos evaluarlo rápido..."
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        required
-                                    ></textarea>
-                                </div>
-                                <div className="row mb-4 g-3">
-                                    <div className="col-md-4">
-                                        <label htmlFor="tenant" className="form-label fw-semibold">Inquilino</label>
-                                        <select
-                                            className="form-select rounded-3"
-                                            id="tenant"
-                                            value={tenantId}
-                                            onChange={(e) => setTenantId(e.target.value)}
-                                        >
-                                            <option value="1">Test User 1 (ID: 1)</option>
-                                            <option value="2">Test User 2 (ID: 2)</option>
-                                            <option value="3">Test User 3 (ID: 3)</option>
-                                        </select>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label htmlFor="property" className="form-label fw-semibold">Inmueble</label>
-                                        <select
-                                            className="form-select rounded-3"
-                                            id="property"
-                                            value={propertyId}
-                                            onChange={(e) => setPropertyId(e.target.value)}
-                                        >
-                                            <option value="1">Calle Falsa 123 (ID: 1)</option>
-                                            <option value="2">Tanwa House (ID: 2)</option>
-                                        </select>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <label htmlFor="asset" className="form-label fw-semibold">Activo / Equipo (Opcional)</label>
-                                        <select
-                                            className="form-select rounded-3"
-                                            id="asset"
-                                            value={assetId}
-                                            onChange={(e) => setAssetId(e.target.value)}
-                                        >
-                                            <option value="">Ninguno / No aplica</option>
-                                            {assets.map((ast) => (
-                                                <option key={ast.id} value={ast.id}>
-                                                    {ast.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div className="d-grid">
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary btn-lg rounded-3 bg-gradient fw-bold border-0 shadow-sm"
-                                        disabled={loading}
-                                    >
-                                        {loading ? (
-                                            <>
-                                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                                Enviando reporte...
-                                            </>
-                                        ) : (
-                                            "Enviar Reporte"
-                                        )}
-                                    </button>
-                                </div>
-                            </form>
+                    )}
+                    <form onSubmit={handleSubmit}>
+                        <div className="space-y-2 mb-4">
+                            <Label htmlFor="title">Título de la Avería</Label>
+                            <Input
+                                type="text"
+                                id="title"
+                                placeholder="Ej. Fuga de agua en cocina"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                required
+                            />
+                        </div>                        <div className="space-y-2 mb-4">
+                            <Label htmlFor="description">Descripción del Problema</Label>
+                            <textarea
+                                className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                id="description"
+                                rows="4"
+                                placeholder="Detalla lo que ocurre para que podamos evaluarlo rápido..."
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                required
+                            ></textarea>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mt-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="tenant">Inquilino</Label>
+                                <Select value={tenantId} onValueChange={(value) => setTenantId(value)}>
+                                    <SelectTrigger id="tenant">
+                                        <SelectValue placeholder="Selecciona..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="1">Test User 1 (ID: 1)</SelectItem>
+                                        <SelectItem value="2">Test User 2 (ID: 2)</SelectItem>
+                                        <SelectItem value="3">Test User 3 (ID: 3)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="property">Inmueble</Label>
+                                <Select value={propertyId} onValueChange={(value) => setPropertyId(value)}>
+                                    <SelectTrigger id="property">
+                                        <SelectValue placeholder="Selecciona..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="1">Calle Falsa 123 (ID: 1)</SelectItem>
+                                        <SelectItem value="2">Tanwa House (ID: 2)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="asset">Activo (Opcional)</Label>
+                                <Select value={assetId || "none"} onValueChange={(value) => setAssetId(value === "none" ? "" : value)}>
+                                    <SelectTrigger id="asset">
+                                        <SelectValue placeholder="Ninguno / No aplica" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">Ninguno / No aplica</SelectItem>
+                                        {assets.map((ast) => (
+                                            <SelectItem key={ast.id} value={ast.id.toString()}>
+                                                {ast.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <Button type="submit" className="w-full mt-2" disabled={loading}>
+                            {loading ? "Enviando reporte..." : "Enviar Reporte"}
+                        </Button>
+                    </form>
+                </CardContent>
+            </Card>
+        </div >
     );
 };
