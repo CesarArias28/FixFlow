@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export const Login = () => {
     const { store, dispatch } = useGlobalReducer();
@@ -60,66 +64,56 @@ export const Login = () => {
     };
 
     return (
-        <div className="container py-5">
-            <div className="row justify-content-center">
-                <div className="col-md-6 col-lg-5">
-                    <div className="card bg-secondary bg-opacity-25 border-0 rounded-4 p-4 text-white shadow-lg">
-                        <div className="text-center mb-4">
-                            <h2 className="fw-bold mb-1">FixFlow Acceso</h2>
-                            <p className="text-white-50">Ingresa tus credenciales para continuar</p>
+        <div className="min-h-[80vh] flex items-center justify-center p-4">
+            <Card className="w-full max-w-md shadow-lg">
+                <CardHeader className="text-center space-y-2">
+                    <CardTitle className="text-2xl font-bold">FixFlow Acceso</CardTitle>
+                    <CardDescription>Ingresa tus credenciales para continuar</CardDescription>
+                </CardHeader>
+                
+                <CardContent>
+                    {error && (
+                        <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md mb-4 text-center font-medium">
+                            {error}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Correo Electrónico</Label>
+                            <Input
+                                type="email"
+                                id="email"
+                                placeholder="ejemplo@correo.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
                         </div>
 
-                        {error && (
-                            <div className="alert alert-danger rounded-3" role="alert">
-                                {error}
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="password">Contraseña</Label>
+                                <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                                    ¿La olvidaste?
+                                </Link>
                             </div>
-                        )}
+                            <Input
+                                type="password"
+                                id="password"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </div>
 
-                        <form onSubmit={handleSubmit}>
-                            <div className="mb-3">
-                                <label htmlFor="email" className="form-label fw-semibold">Correo Electrónico</label>
-                                <input
-                                    type="email"
-                                    className="form-control rounded-3"
-                                    id="email"
-                                    placeholder="ejemplo@correo.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                />
-                            </div>
-
-                            <div className="mb-4">
-                                <div className="d-flex justify-content-between mb-1">
-                                    <label htmlFor="password" className="form-label fw-semibold mb-0">Contraseña</label>
-                                    <Link to="/forgot-password" className="text-info small text-decoration-none">
-                                        ¿La olvidaste?
-                                    </Link>
-                                </div>
-                                <input
-                                    type="password"
-                                    className="form-control rounded-3"
-                                    id="password"
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                            </div>
-
-                            <div className="d-grid mb-3">
-                                <button
-                                    type="submit"
-                                    className="btn btn-primary btn-lg rounded-3 bg-gradient fw-bold border-0"
-                                    disabled={loading}
-                                >
-                                    {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+                        <Button type="submit" className="w-full mt-6" disabled={loading}>
+                            {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
+                        </Button>
+                    </form>
+                </CardContent>
+            </Card>
         </div>
     );
 };
