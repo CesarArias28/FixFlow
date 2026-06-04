@@ -52,6 +52,7 @@ class Incidence(db.Model):
       
     tenant_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
     property_id: Mapped[int] = mapped_column(ForeignKey('property.id'), nullable=False)
+    property = db.relationship('Property', backref='incidences')
     technician_id: Mapped[Optional[int]] = mapped_column(ForeignKey('user.id'), nullable=True)
 
 

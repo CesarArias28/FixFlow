@@ -119,7 +119,7 @@ export const TechnicianDashboard = () => {
                                 <div className="bg-slate-50 rounded-xl p-3 mb-4 space-y-2 border border-slate-100">
                                     <div className="flex items-center gap-2 text-sm text-slate-600">
                                         <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
-                                        <span><strong className="font-semibold text-slate-700">Inmueble:</strong> ID {inc.property_id}</span>
+                                        <span><strong className="font-semibold text-slate-700">Inmueble:</strong> {inc.property_address || `ID ${inc.property_id}`}</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-slate-600">
                                         <AlertCircle className="w-4 h-4 text-slate-400 shrink-0" />

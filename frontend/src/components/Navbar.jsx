@@ -25,8 +25,8 @@ export const Navbar = () => {
             label = "Portal Técnico";
             path = "/technician";
         } else if (store.role === "inquilino") {
-            label = "Reportar Avería";
-            path = "/incidence/new";
+            label = "Mi Portal";
+            path = "/client-dashboard";
         } else if (store.role === "administrador" || store.role === "inmobiliaria") {
             label = "Panel Admin";
             path = "/dashboard";
@@ -90,10 +90,15 @@ export const Navbar = () => {
                                     </div>
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator className="bg-border/50 my-1" />
-                                <DropdownMenuItem className="p-3 text-muted-foreground focus:bg-zinc-900/50 focus:text-foreground cursor-pointer rounded-lg transition-colors">
-                                    <Settings className="w-4 h-4 mr-2" />
-                                    <span>Configuración</span>
-                                </DropdownMenuItem>
+                                {(store.role === "administrador" || store.role === "inmobiliaria") && (
+                                    <DropdownMenuItem 
+                                        className="p-3 text-blue-600 focus:bg-blue-50 focus:text-blue-700 cursor-pointer rounded-lg transition-colors"
+                                        onClick={() => window.open(import.meta.env.VITE_BACKEND_URL + '/admin', '_blank')}
+                                    >
+                                        <Settings className="w-4 h-4 mr-2" />
+                                        <span className="font-medium">Backoffice (SuperAdmin)</span>
+                                    </DropdownMenuItem>
+                                )}
                                 <DropdownMenuItem onClick={handleLogout} className="p-3 text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer rounded-lg transition-colors mt-1">
                                     <LogOut className="w-4 h-4 mr-2" />
                                     <span>Cerrar Sesión</span>

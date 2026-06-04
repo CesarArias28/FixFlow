@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { apiClient } from "../apiClient";
 import { RefreshCw, ClipboardList, Clock, CheckCircle, AlertTriangle } from "lucide-react";
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 export const Dashboard = () => {
     const [incidences, setIncidences] = useState([]);
@@ -127,7 +128,8 @@ export const Dashboard = () => {
     const assetIncidenceCounts = {};
     incidences.forEach((inc) => {
         if (inc.asset_id && inc.asset_name) {
-            assetIncidenceCounts[inc.asset_name] = (assetIncidenceCounts[inc.asset_name] || 0) + 1;
+            const key = `${inc.asset_name} (${inc.property_address || 'Propiedad ' + inc.property_id})`;
+            assetIncidenceCounts[key] = (assetIncidenceCounts[key] || 0) + 1;
         }
     });
     const criticalAssets = Object.keys(assetIncidenceCounts).filter(
@@ -137,6 +139,26 @@ export const Dashboard = () => {
     const totalIncidences = incidences.length;
     const pendingIncidences = incidences.filter(inc => inc.status === "Pendiente").length;
     const resolvedIncidences = incidences.filter(inc => inc.status === "Resuelto").length;
+    const inProgressIncidences = incidences.filter(inc => inc.status === "En progreso").length;
+
+    const statusData = [
+        { name: 'Pendientes', value: pendingIncidences, color: '#f59e0b' },
+        { name: 'En Progreso', value: inProgressIncidences, color: '#3b82f6' },
+        { name: 'Resueltas', value: resolvedIncidences, color: '#10b981' },
+    ];
+
+    const severityCounts = { "Baja": 0, "Media": 0, "Alta": 0, "Crítica": 0 };
+    incidences.forEach(inc => {
+        if (inc.severity) {
+            severityCounts[inc.severity] = (severityCounts[inc.severity] || 0) + 1;
+        }
+    });
+    const severityData = [
+        { name: 'Baja', value: severityCounts["Baja"], fill: '#10b981' },
+        { name: 'Media', value: severityCounts["Media"], fill: '#f59e0b' },
+        { name: 'Alta', value: severityCounts["Alta"], fill: '#ef4444' },
+        { name: 'Crítica', value: severityCounts["Crítica"], fill: '#7f1d1d' },
+    ];
 
     return (
         <div className="min-h-screen bg-slate-50/50 p-6 md:p-10">
@@ -187,6 +209,49 @@ export const Dashboard = () => {
                         </div>
                     </div>
                 </div>
+
+                {incidences.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 className="text-lg font-bold text-slate-800 mb-4 text-center">Estado de Incidencias</h3>
+                            <div className="h-64 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={statusData}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                        >
+                                            {statusData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip />
+                                        <Legend />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 className="text-lg font-bold text-slate-800 mb-4 text-center">Severidad Acumulada</h3>
+                            <div className="h-64 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={severityData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                                        <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
+                                        <YAxis stroke="#94a3b8" fontSize={12} allowDecimals={false} />
+                                        <Tooltip cursor={{ fill: '#f8fafc' }} />
+                                        <Bar dataKey="value" radius={[4, 4, 0, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="space-y-6">
 
@@ -271,7 +336,7 @@ export const Dashboard = () => {
 
                                                     <td className="py-4 px-6">
                                                         <div className="text-sm font-semibold text-slate-900 mb-0.5">{inc.title}</div>
-                                                        <div className="text-xs text-slate-500 mb-2">Inmueble ID: {inc.property_id}</div>
+                                                        <div className="text-xs text-slate-500 mb-2 font-medium">Inmueble: {inc.property_address}</div>
 
                                                         {inc.asset_name && (
                                                             <div className="flex items-center gap-2">

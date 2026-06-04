@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { LogoFixFlow } from "../components/LogoFixFlow";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,6 +57,9 @@ export const Register = () => {
         <div className="min-h-[80vh] flex items-center justify-center p-4">
             <Card className="w-full max-w-md shadow-lg">
                 <CardHeader className="text-center space-y-2">
+                    <div className="flex justify-center mb-2">
+                        <LogoFixFlow className="w-12 h-12 text-primary" />
+                    </div>
                     <CardTitle className="text-2xl font-bold">Registro de Inquilino</CardTitle>
                     <CardDescription>Crea tu cuenta ingresando el PIN de tu inmueble</CardDescription>
                 </CardHeader>

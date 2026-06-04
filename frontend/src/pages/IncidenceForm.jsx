@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { apiClient } from "../apiClient";
+import { LogoFixFlow } from "../components/LogoFixFlow";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +18,7 @@ export const IncidenceForm = () => {
     const propertyId = store.property_id;
     const [assets, setAssets] = useState([]);
     const [assetId, setAssetId] = useState("");
+    const [customAssetName, setCustomAssetName] = useState("");
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [statusMsg, setStatusMsg] = useState({ type: "", text: "" });
     const [loading, setLoading] = useState(false);
@@ -66,7 +68,8 @@ export const IncidenceForm = () => {
                     description,
                     tenant_id: parseInt(store.userId),
                     property_id: parseInt(propertyId),
-                    asset_id: assetId ? parseInt(assetId) : null
+                    asset_id: (assetId && assetId !== "other") ? parseInt(assetId) : null,
+                    custom_asset_name: assetId === "other" ? customAssetName : null
                 })
             });
 
@@ -89,9 +92,15 @@ export const IncidenceForm = () => {
     return (
         <div className="min-h-screen flex items-center justify-center p-4 py-12">
             <Card className="w-full max-w-2xl shadow-lg border-0">
-                <CardHeader className="text-center bg-primary text-primary-foreground rounded-t-lg mb-6">
-                    <CardTitle className="text-2xl">Reportar Nueva Avería</CardTitle>
-                    <CardDescription className="text-primary-foreground/80">FixFlow - Canal de Atención Directo</CardDescription>
+                <CardHeader className="text-center bg-primary text-primary-foreground rounded-t-lg mb-6 pt-8 pb-8 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-black/10"></div>
+                    <div className="relative z-10">
+                        <div className="flex justify-center mb-4">
+                            <LogoFixFlow className="w-16 h-16 text-primary-foreground drop-shadow-md" />
+                        </div>
+                        <CardTitle className="text-2xl drop-shadow-sm">Reportar Nueva Avería</CardTitle>
+                        <CardDescription className="text-primary-foreground/90 mt-1">FixFlow - Canal de Atención Directo</CardDescription>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     {statusMsg.text && (
@@ -136,8 +145,20 @@ export const IncidenceForm = () => {
                                                 {ast.name}
                                             </SelectItem>
                                         ))}
+                                        <SelectItem value="other">Otro (Añadir nuevo...)</SelectItem>
                                     </SelectContent>
                                 </Select>
+                                {assetId === "other" && (
+                                    <div className="mt-2">
+                                        <Input
+                                            type="text"
+                                            placeholder="Ej. Caldera del portal 2"
+                                            value={customAssetName}
+                                            onChange={(e) => setCustomAssetName(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <Button type="submit" className="w-full mt-2" disabled={loading}>

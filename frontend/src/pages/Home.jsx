@@ -1,8 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 import { Button } from "@/components/ui/button";
 
 export const Home = () => {
+    const { store } = useGlobalReducer();
+
+    const getDashboardPath = () => {
+        if (store.role === "inquilino") return "/client-dashboard";
+        if (store.role === "tecnico") return "/technician";
+        return "/dashboard";
+    };
 	return (
 		<div className="min-h-[calc(100vh-80px)] bg-slate-50 flex flex-col overflow-hidden">
 			<div className="flex-1 w-full max-w-7xl mx-auto px-6 py-12 md:py-20 flex flex-col lg:flex-row items-center gap-12">
@@ -22,7 +30,7 @@ export const Home = () => {
 							<Link to="/incidence/new">Reportar Avería</Link>
 						</Button>
 						<Button asChild size="lg" variant="outline" className="bg-white border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg h-12 px-6 text-base font-medium shadow-sm">
-							<Link to="/dashboard">Panel de Control</Link>
+							<Link to={getDashboardPath()}>Panel de Control</Link>
 						</Button>
 					</div>
 				</div>

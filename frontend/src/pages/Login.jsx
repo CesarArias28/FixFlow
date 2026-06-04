@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
+import { LogoFixFlow } from "../components/LogoFixFlow";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +55,8 @@ export const Login = () => {
                     navigate("/dashboard");
                 } else if (data.role === "tecnico") {
                     navigate("/technician");
+                } else if (data.role === "inquilino") {
+                    navigate("/client-dashboard");
                 } else {
                     navigate("/");
                 }
@@ -71,6 +74,9 @@ export const Login = () => {
         <div className="min-h-[80vh] flex items-center justify-center p-4">
             <Card className="w-full max-w-md shadow-lg">
                 <CardHeader className="text-center space-y-2">
+                    <div className="flex justify-center mb-2">
+                        <LogoFixFlow className="w-12 h-12 text-primary" />
+                    </div>
                     <CardTitle className="text-2xl font-bold">FixFlow Acceso</CardTitle>
                     <CardDescription>Ingresa tus credenciales para continuar</CardDescription>
                 </CardHeader>

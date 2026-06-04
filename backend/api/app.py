@@ -163,13 +163,23 @@ def create_incidence():
     tenant = User.query.get(tenant_id)
     property_id = data.get('property_id') or (tenant.property_id if tenant else None)
 
+    asset_id = data.get('asset_id')
+    custom_asset_name = data.get('custom_asset_name')
+
+    if custom_asset_name and not asset_id:
+        from .models import Asset
+        new_asset = Asset(name=custom_asset_name, property_id=property_id)
+        db.session.add(new_asset)
+        db.session.flush()
+        asset_id = new_asset.id
+
     new_incidence = Incidence(
         title=data['title'], 
         description=data['description'],
         tenant_id=tenant_id,
         property_id=property_id,
         technician_id=data.get('technician_id'),
-        asset_id=data.get('asset_id')
+        asset_id=asset_id
     )
     db.session.add(new_incidence)
     db.session.commit()
@@ -178,9 +188,13 @@ def create_incidence():
 @app.route('/incidences', methods=['GET'])
 @jwt_required()
 def get_incidences():
-    
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
     tech_id = request.args.get('technician_id')
-    if tech_id:
+    
+    if user.role == 'inquilino':
+        incidences = Incidence.query.filter_by(tenant_id=current_user_id).all()
+    elif tech_id:
         incidences = Incidence.query.filter_by(technician_id=tech_id).all()
     else:
         incidences = Incidence.query.all()
@@ -192,6 +206,7 @@ def get_incidences():
         "status": inc.status,
         "tenant_id": inc.tenant_id,
         "property_id": inc.property_id,
+        "property_address": inc.property.address if inc.property else f"ID {inc.property_id}",
         "severity": inc.severity,
         "specialty": inc.specialty,
         "technician_id": inc.technician_id,
