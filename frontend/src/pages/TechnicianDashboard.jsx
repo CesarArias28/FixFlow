@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { apiClient } from "../apiClient";
+import { Wrench, MapPin, CheckCircle2, ClipboardList, AlertCircle } from "lucide-react";
 
 export const TechnicianDashboard = () => {
     const { store } = useGlobalReducer();

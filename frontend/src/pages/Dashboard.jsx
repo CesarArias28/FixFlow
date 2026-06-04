@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { apiClient } from "../apiClient";
+import { RefreshCw, ClipboardList, Clock, CheckCircle, AlertTriangle } from "lucide-react";
 
 export const Dashboard = () => {
     const [incidences, setIncidences] = useState([]);
@@ -26,7 +27,6 @@ export const Dashboard = () => {
         }
     };
 
-
     const fetchTechnicians = async () => {
         setLoading(true);
         try {
@@ -38,7 +38,6 @@ export const Dashboard = () => {
             else {
                 setError("No se encontro el tecnico");
             }
-
         } catch (err) {
             setError("Error de red al conectar el servidor.")
         } finally {
@@ -92,18 +91,38 @@ export const Dashboard = () => {
         }
     };
 
+    const handleUpdateField = async (id, field, value) => {
+        try {
+            const response = await apiClient(`/incidences/${id}`, {
+                method: "PUT",
+                body: JSON.stringify({ [field]: value })
+            });
+
+            if (response.ok) {
+                setIncidences(prev =>
+                    prev.map(inc => (inc.id === id ? { ...inc, [field]: value } : inc))
+                );
+            } else {
+                alert(`Error al actualizar ${field} en el servidor.`);
+            }
+        } catch (err) {
+            alert(`Error de red al intentar actualizar ${field}.`);
+        }
+    };
+
     const getStatusBadge = (status) => {
         switch (status) {
             case "Pendiente":
-                return <span className="badge bg-warning text-dark px-3 py-2 rounded-pill">Pendiente</span>;
+                return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">Pendiente</span>;
             case "En progreso":
-                return <span className="badge bg-info text-white px-3 py-2 rounded-pill">En Progreso</span>;
+                return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">En Progreso</span>;
             case "Resuelto":
-                return <span className="badge bg-success text-white px-3 py-2 rounded-pill">Resuelto</span>;
+                return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">Resuelto</span>;
             default:
-                return <span className="badge bg-secondary px-3 py-2 rounded-pill">{status}</span>;
+                return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">{status}</span>;
         }
     };
+
     const assetIncidenceCounts = {};
     incidences.forEach((inc) => {
         if (inc.asset_id && inc.asset_name) {
@@ -113,162 +132,212 @@ export const Dashboard = () => {
     const criticalAssets = Object.keys(assetIncidenceCounts).filter(
         (name) => assetIncidenceCounts[name] >= 3
     );
+
+    const totalIncidences = incidences.length;
+    const pendingIncidences = incidences.filter(inc => inc.status === "Pendiente").length;
+    const resolvedIncidences = incidences.filter(inc => inc.status === "Resuelto").length;
+
     return (
-        <div className="container py-5">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 className="fw-bold mb-1">Panel de Control de Incidencias</h2>
-                    <p className="text-muted">Consola de administración para la gestión de averías</p>
-                </div>
-                <button className="btn btn-outline-primary rounded-pill px-4" onClick={fetchIncidences}>
-                    Refrescar datos
-                </button>
-            </div>
+        <div className="min-h-screen bg-slate-50/50 p-6 md:p-10">
+            <div className="max-w-7xl mx-auto space-y-8">
 
-            {error && (
-                <div className="alert alert-danger" role="alert">
-                    {error}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Panel de Control</h1>
+                        <p className="text-slate-500 mt-1">Gestión general de incidencias y mantenimiento</p>
+                    </div>
+                    <button
+                        onClick={fetchIncidences}
+                        disabled={loading}
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 font-medium hover:bg-slate-50 hover:text-emerald-600 transition-colors shadow-sm disabled:opacity-50"
+                    >
+                        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                        Refrescar Datos
+                    </button>
                 </div>
-            )}
 
-            {criticalAssets.length > 0 && (
-                <div className="alert alert-danger shadow-sm rounded-4 mb-4 border-0 p-4" role="alert">
-                    <div className="d-flex align-items-start">
-                        <span className="fs-3 me-3"></span>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                            <ClipboardList className="w-6 h-6" />
+                        </div>
                         <div>
-                            <h5 className="alert-heading fw-bold mb-1">Mantenimiento Preventivo Requerido</h5>
-                            <p className="mb-0 small text-muted">
-                                Los siguientes activos han acumulado **3 o más averías** y requieren inspección técnica urgente o sustitución:
-                            </p>
-                            <ul className="mt-2 mb-0 fw-semibold text-danger small">
-                                {criticalAssets.map((name) => (
-                                    <li key={name}>
-                                        {name} ({assetIncidenceCounts[name]} averías registradas)
-                                    </li>
-                                ))}
-                            </ul>
+                            <p className="text-sm font-medium text-slate-500">Total Incidencias</p>
+                            <h3 className="text-2xl font-bold text-slate-900">{totalIncidences}</h3>
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                            <Clock className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-500">Pendientes</p>
+                            <h3 className="text-2xl font-bold text-slate-900">{pendingIncidences}</h3>
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                            <CheckCircle className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-slate-500">Resueltas</p>
+                            <h3 className="text-2xl font-bold text-slate-900">{resolvedIncidences}</h3>
                         </div>
                     </div>
                 </div>
-            )}
 
-            {loading ? (
-                <div className="text-center py-5">
-                    <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Cargando incidencias...</span>
-                    </div>
-                </div>
-            ) : incidences.length === 0 ? (
-                <div className="text-center py-5 border rounded-3 bg-light">
-                    <p className="lead text-muted mb-0">No se han registrado incidencias hasta el momento.</p>
-                </div>
-            ) : (
-                <div className="card shadow border-0 rounded-4 overflow-hidden">
-                    <div className="table-responsive">
-                        <table className="table table-hover align-middle mb-0">
-                            <thead className="table-dark bg-gradient">
-                                <tr>
-                                    <th className="py-3 px-4" style={{ width: "80px" }}>ID</th>
-                                    <th className="py-3">Título / Inmueble</th>
-                                    <th className="py-3">Descripción</th>
-                                    <th className="py-3 text-center">Estado</th>
-                                    <th className="py-3 text-center">Severidad / Especialidad</th>
-                                    <th className="py-3 text-center" style={{ width: "260px" }}>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {incidences.map((inc) => (
-                                    <tr key={inc.id}>
-                                        <td className="fw-bold px-4">#{inc.id}</td>
-                                        <td>
-                                            <div className="fw-bold">{inc.title}</div>
-                                            <small className="text-muted d-block">Inmueble ID: {inc.property_id}</small>
-                                            {inc.asset_name && (
-                                                <div className="mt-1 d-flex align-items-center gap-2">
-                                                    <span className={`badge ${criticalAssets.includes(inc.asset_name) ? "bg-danger text-white" : "bg-light text-secondary"} px-2 py-1 rounded-pill small`}>
-                                                        {inc.asset_name}
-                                                    </span>
-                                                    {criticalAssets.includes(inc.asset_name) && (
-                                                        <span className="text-danger small fw-bold" style={{ fontSize: "0.75rem" }}>
-                                                            Crítico
-                                                        </span>
+                <div className="space-y-6">
+
+                    {error && (
+                        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm">
+                            <p className="text-red-700 font-medium">{error}</p>
+                        </div>
+                    )}
+
+                    {criticalAssets.length > 0 && (
+                        <div className="bg-red-50/80 border border-red-200 rounded-xl p-5 shadow-sm">
+                            <div className="flex items-start gap-4">
+                                <div className="bg-red-100 p-2.5 rounded-full shrink-0">
+                                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                                </div>
+                                <div>
+                                    <h4 className="text-red-900 font-bold mb-1">Mantenimiento Preventivo Requerido</h4>
+                                    <p className="text-red-700/90 text-sm mb-4">
+                                        Los siguientes activos han acumulado 3 o más averías y requieren inspección técnica urgente o sustitución:
+                                    </p>
+                                    <ul className="flex flex-wrap gap-3">
+                                        {criticalAssets.map((name) => (
+                                            <li key={name} className="flex items-center gap-2 text-sm text-red-800 bg-red-100/60 px-3 py-1.5 rounded-lg border border-red-200/50 shadow-sm">
+                                                <span className="font-bold">{name}</span>
+                                                <span className="text-red-400">|</span>
+                                                <span>{assetIncidenceCounts[name]} averías</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {loading ? (
+                        <div className="text-center py-5">
+                            <div className="spinner-border text-primary" role="status">
+                                <span className="visually-hidden">Cargando incidencias...</span>
+                            </div>
+                        </div>
+                    ) : incidences.length === 0 ? (
+                        <div className="text-center py-5 border rounded-3 bg-light">
+                            <p className="lead text-muted mb-0">No se han registrado incidencias hasta el momento.</p>
+                        </div>
+                    ) : (
+                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="bg-slate-50 border-b border-slate-200 text-sm text-slate-500 uppercase tracking-wider">
+                                            <th className="py-4 px-6 font-medium">ID</th>
+                                            <th className="py-4 px-6 font-medium">Título / Inmueble</th>
+                                            <th className="py-4 px-6 font-medium">Descripción</th>
+                                            <th className="py-4 px-6 font-medium text-center">Estado</th>
+                                            <th className="py-4 px-6 font-medium text-center">Categorías</th>
+                                            <th className="py-4 px-6 font-medium text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {incidences.map((inc) => (
+                                            <tr key={inc.id} className="hover:bg-slate-50/50 transition-colors group">
+
+                                                <td className="py-4 px-6 text-sm font-semibold text-slate-900">
+                                                    #{inc.id}
+                                                </td>
+
+                                                <td className="py-4 px-6">
+                                                    <div className="text-sm font-semibold text-slate-900 mb-0.5">{inc.title}</div>
+                                                    <div className="text-xs text-slate-500 mb-2">Inmueble ID: {inc.property_id}</div>
+
+                                                    {inc.asset_name && (
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${criticalAssets.includes(inc.asset_name)
+                                                                ? "bg-red-50 text-red-700 border-red-200"
+                                                                : "bg-slate-100 text-slate-600 border-slate-200"
+                                                                }`}>
+                                                                {inc.asset_name}
+                                                            </span>
+                                                            {criticalAssets.includes(inc.asset_name) && (
+                                                                <span className="text-xs font-bold text-red-600 animate-pulse">Crítico</span>
+                                                            )}
+                                                        </div>
                                                     )}
-                                                </div>
-                                            )}
-                                        </td>
-                                        <td>
-                                            <p className="mb-0 text-truncate" style={{ maxWidth: "300px" }} title={inc.description}>
-                                                {inc.description}
-                                            </p>
-                                            <small className="text-muted d-block">Inquilino ID: {inc.tenant_id}</small>
-                                        </td>
-                                        <td className="text-center">
-                                            {getStatusBadge(inc.status)}
-                                        </td>
-                                        <td className="text-center">
-                                            <div className="mb-1">
-                                                <span className={`badge ${inc.severity === "Alta" ? "bg-danger" : "bg-secondary"} px-2 py-1`}>
-                                                    {inc.severity || "No asignado"}
-                                                </span>
-                                            </div>
-                                            <div className="mb-2">
-                                                <span className="badge bg-dark px-2 py-1">
-                                                    {inc.specialty || "No asignada"}
-                                                </span>
-                                            </div>
-                                            <div style={{ maxWidth: "160px" }} className="mx-auto">
-                                                <select
-                                                    className="form-select form-select-sm rounded-3"
-                                                    value={inc.technician_id || ""}
-                                                    onChange={(e) => handleAssignTechnician(inc.id, e.target.value)}
-                                                >
-                                                    <option value="">Sin asignar</option>
-                                                    {technicians.map((tech) => (
-                                                        <option key={tech.id} value={tech.id}>
-                                                            {tech.email}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        </td>
-                                        <td className="text-center">
-                                            <div className="d-flex gap-2 justify-content-center">
-                                                {inc.status === "Pendiente" && (
-                                                    <button
-                                                        className="btn btn-sm btn-info text-white rounded-pill px-3"
-                                                        onClick={() => handleUpdateStatus(inc.id, "En progreso")}
-                                                    >
-                                                        Iniciar
-                                                    </button>
-                                                )}
-                                                {inc.status !== "Resuelto" && (
-                                                    <button
-                                                        className="btn btn-sm btn-success rounded-pill px-3"
-                                                        onClick={() => handleUpdateStatus(inc.id, "Resuelto")}
-                                                    >
-                                                        Resolver
-                                                    </button>
-                                                )}
-                                                {inc.status === "Resuelto" && (
-                                                    <div className="d-flex flex-column align-items-center gap-1">
-                                                        <span className="text-success small fw-bold">Completado</span>
-                                                        <button
-                                                            className="btn btn-sm btn-outline-danger rounded-pill px-2 py-0"
-                                                            style={{ fontSize: "0.75rem" }}
-                                                            onClick={() => window.open(`${backendUrl}/incidences/${inc.id}/pdf`, "_blank")}
-                                                        >
-                                                            PDF
-                                                        </button>
+                                                </td>
+
+                                                <td className="py-4 px-6">
+                                                    <p className="text-sm text-slate-600 truncate max-w-[250px]" title={inc.description}>
+                                                        {inc.description}
+                                                    </p>
+                                                    <div className="text-xs text-slate-400 mt-1">Inquilino ID: {inc.tenant_id}</div>
+                                                </td>
+                                                <td>
+                                                    <p className="mb-0 text-truncate" style={{ maxWidth: "300px" }} title={inc.description}>
+                                                        {inc.description}
+                                                    </p>
+                                                    <small className="text-muted d-block">Inquilino ID: {inc.tenant_id}</small>
+                                                </td>
+                                                <td className="py-4 px-6 text-center">
+                                                    {getStatusBadge(inc.status)}
+                                                </td>
+
+                                                <td className="py-4 px-6"> <div className="flex flex-col gap-2 w-full max-w-[160px]">
+                                                    <select className="w-full text-[11px] font-bold uppercase tracking-wider border border-slate-200 text-slate-700 rounded-md py-1 px-2 focus:ring-red-500 bg-white shadow-sm cursor-pointer" value={inc.severity || ""}
+                                                        onChange={(e) => handleUpdateField(inc.id, "severity", e.target.value)}>
+                                                        <option value="">Severidad...</option> <option value="Baja">🟢 Baja</option> <option value="Media">🟡 Media</option> <option value="Alta">🔴 Alta</option>
+                                                    </select>
+                                                    <select className="w-full text-[11px] font-bold uppercase tracking-wider border border-slate-200 text-slate-700 rounded-md py-1 px-2 focus:ring-slate-800 bg-white shadow-sm cursor-pointer"
+                                                        value={inc.specialty || ""} onChange={(e) => handleUpdateField(inc.id, "specialty", e.target.value)}
+                                                    > <option value="">Especialidad...</option> <option value="Plomeria">Plomería</option> <option value="Electricidad"> Electricidad</option>
+                                                        <option value="Climatizacion">Climatización</option> <option value="General">General</option> </select><select className="w-full text-[11px] font-bold uppercase tracking-wider border border-emerald-200 text-emerald-800 rounded-md py-1 px-2 focus:ring-emerald-500 bg-emerald-50 shadow-sm cursor-pointer"
+                                                            value={inc.technician_id || ""} onChange={(e) => handleAssignTechnician(inc.id, e.target.value)} > <option value="">Sin técnico</option> {technicians.map((tech) => (<option key={tech.id} value={tech.id}> {tech.email} </option>))} </select> </div> </td>
+
+                                                <td className="py-4 px-6">
+                                                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+                                                        {inc.status === "Pendiente" && (
+                                                            <button
+                                                                className="text-xs font-medium px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-md transition-colors border border-blue-200"
+                                                                onClick={() => handleUpdateStatus(inc.id, "En progreso")}
+                                                            >
+                                                                Iniciar
+                                                            </button>
+                                                        )}
+                                                        {inc.status !== "Resuelto" && (
+                                                            <button
+                                                                className="text-xs font-medium px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-md transition-colors border border-emerald-200"
+                                                                onClick={() => handleUpdateStatus(inc.id, "Resuelto")}
+                                                            >
+                                                                Resolver
+                                                            </button>
+                                                        )}
+                                                        {inc.status === "Resuelto" && (
+                                                            <div className="flex items-center gap-2">
+                                                                <button
+                                                                    className="text-xs font-medium px-3 py-1.5 bg-white text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors border border-slate-200 shadow-sm flex items-center gap-1"
+                                                                    title="Descargar Reporte PDF"
+                                                                    onClick={() => window.open(`${backendUrl}/incidences/${inc.id}/pdf`, "_blank")}
+                                                                >
+                                                                    <ClipboardList className="w-3.5 h-3.5" /> PDF
+                                                                </button>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                 </div>
-            )}
-        </div>)
+            </div>
+        </div>
+    );
 };
