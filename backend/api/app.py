@@ -57,8 +57,42 @@ def login():
         "access_token": access_token,
         "role": user.role,
         "email": user.email,
-        "user_id": user.id
+        "user_id": user.id,
+        "property_id": user.property_id
     }), 200
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+    email = data.get("email")
+    password = data.get("password")
+    pin_code = data.get("pin_code")
+    phone_prefix = data.get("phone_prefix", "")
+    phone_number = data.get("phone_number", "")
+
+    if not email or not password or not pin_code:
+        return jsonify({"message": "Email, contraseña y PIN de Inmueble son obligatorios"}), 400
+
+    prop = Property.query.filter_by(pin_code=pin_code).first()
+    if not prop:
+        return jsonify({"message": "El PIN de Inmueble es inválido"}), 400
+
+    if User.query.filter_by(email=email).first():
+        return jsonify({"message": "Este correo ya está registrado"}), 400
+
+    new_user = User(
+        email=email,
+        role="inquilino",
+        phone_prefix=phone_prefix,
+        phone_number=phone_number,
+        property_id=prop.id
+    )
+    new_user.set_password(password)
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({"message": "Registro completado con éxito"}), 201
+
 
 @app.route('/forgot-password', methods=['POST'])
 def forgot_password():
@@ -126,12 +160,14 @@ def create_incidence():
     data = request.get_json()
     
     tenant_id = data.get('tenant_id') or current_user_id
+    tenant = User.query.get(tenant_id)
+    property_id = data.get('property_id') or (tenant.property_id if tenant else None)
 
     new_incidence = Incidence(
         title=data['title'], 
         description=data['description'],
         tenant_id=tenant_id,
-        property_id=data['property_id'],
+        property_id=property_id,
         technician_id=data.get('technician_id'),
         asset_id=data.get('asset_id')
     )
@@ -333,6 +369,20 @@ def delete_incidence(id):
     db.session.commit()
     return jsonify({"message": "Incidencia eliminada"}), 200
 
+
+@app.route('/tenants', methods=['GET'])
+@jwt_required()
+def get_tenants():
+    tenants = User.query.filter_by(role='inquilino').all()
+    tenants_list = [{"id": t.id, "email": t.email} for t in tenants]
+    return jsonify(tenants_list), 200
+
+@app.route('/properties', methods=['GET'])
+@jwt_required()
+def get_properties():
+    properties = Property.query.all()
+    props_list = [{"id": p.id, "address": p.address} for p in properties]
+    return jsonify(props_list), 200
 
 @app.route('/technicians', methods=['GET'])
 @jwt_required()

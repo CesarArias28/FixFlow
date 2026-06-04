@@ -35,14 +35,18 @@ export const Login = () => {
                 localStorage.setItem("role", data.role);
                 localStorage.setItem("email", data.email);
                 localStorage.setItem("userId", data.user_id);
+                if (data.property_id) {
+                    localStorage.setItem("property_id", data.property_id);
+                }
 
                 dispatch({
-                    type: "login_success",
+                    type: "login",
                     payload: {
                         token: data.access_token,
                         role: data.role,
+                        userId: data.user_id,
                         email: data.email,
-                        userId: data.user_id
+                        property_id: data.property_id
                     }
                 });
 

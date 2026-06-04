@@ -64,7 +64,7 @@ export const Navbar = () => {
 								<Link to="/login">Iniciar sesión</Link>
 							</Button>
 							<Button asChild className="rounded-full px-6 bg-primary text-primary-foreground hover:bg-primary/90">
-								<Link to="/login">Regístrate</Link>
+								<Link to="/register">Regístrate</Link>
 							</Button>
 						</>
 					) : (

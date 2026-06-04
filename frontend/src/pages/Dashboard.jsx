@@ -4,6 +4,7 @@ import { RefreshCw, ClipboardList, Clock, CheckCircle, AlertTriangle } from "luc
 
 export const Dashboard = () => {
     const [incidences, setIncidences] = useState([]);
+    const [activeTab, setActiveTab] = useState("activas");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [technicians, setTechnicians] = useState([]);
@@ -231,110 +232,121 @@ export const Dashboard = () => {
                             <p className="lead text-muted mb-0">No se han registrado incidencias hasta el momento.</p>
                         </div>
                     ) : (
-                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr className="bg-slate-50 border-b border-slate-200 text-sm text-slate-500 uppercase tracking-wider">
-                                            <th className="py-4 px-6 font-medium">ID</th>
-                                            <th className="py-4 px-6 font-medium">Título / Inmueble</th>
-                                            <th className="py-4 px-6 font-medium">Descripción</th>
-                                            <th className="py-4 px-6 font-medium text-center">Estado</th>
-                                            <th className="py-4 px-6 font-medium text-center">Categorías</th>
-                                            <th className="py-4 px-6 font-medium text-center">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100">
-                                        {incidences.map((inc) => (
-                                            <tr key={inc.id} className="hover:bg-slate-50/50 transition-colors group">
+                        <>
+                            <div className="flex border-b border-slate-200 mb-4">
+                                <button
+                                    className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === "activas" ? "border-emerald-500 text-emerald-600" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+                                    onClick={() => setActiveTab("activas")}
+                                >
+                                    Activas
+                                </button>
+                                <button
+                                    className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === "completadas" ? "border-emerald-500 text-emerald-600" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+                                    onClick={() => setActiveTab("completadas")}
+                                >
+                                    Incidencias resueltas
+                                </button>
+                            </div>
 
-                                                <td className="py-4 px-6 text-sm font-semibold text-slate-900">
-                                                    #{inc.id}
-                                                </td>
+                            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="bg-slate-50 border-b border-slate-200 text-sm text-slate-500 uppercase tracking-wider">
+                                                <th className="py-4 px-6 font-medium">ID</th>
+                                                <th className="py-4 px-6 font-medium">Título / Inmueble</th>
+                                                <th className="py-4 px-6 font-medium">Descripción</th>
+                                                <th className="py-4 px-6 font-medium text-center">Estado</th>
+                                                <th className="py-4 px-6 font-medium text-center">Categorías</th>
+                                                <th className="py-4 px-6 font-medium text-center">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100">
+                                            {(activeTab === "activas" ? incidences.filter(i => i.status !== "Resuelto") : incidences.filter(i => i.status === "Resuelto")).map((inc) => (
+                                                <tr key={inc.id} className="hover:bg-slate-50/50 transition-colors group">
 
-                                                <td className="py-4 px-6">
-                                                    <div className="text-sm font-semibold text-slate-900 mb-0.5">{inc.title}</div>
-                                                    <div className="text-xs text-slate-500 mb-2">Inmueble ID: {inc.property_id}</div>
+                                                    <td className="py-4 px-6 text-sm font-semibold text-slate-900">
+                                                        #{inc.id}
+                                                    </td>
 
-                                                    {inc.asset_name && (
-                                                        <div className="flex items-center gap-2">
-                                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${criticalAssets.includes(inc.asset_name)
-                                                                ? "bg-red-50 text-red-700 border-red-200"
-                                                                : "bg-slate-100 text-slate-600 border-slate-200"
-                                                                }`}>
-                                                                {inc.asset_name}
-                                                            </span>
-                                                            {criticalAssets.includes(inc.asset_name) && (
-                                                                <span className="text-xs font-bold text-red-600 animate-pulse">Crítico</span>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                </td>
+                                                    <td className="py-4 px-6">
+                                                        <div className="text-sm font-semibold text-slate-900 mb-0.5">{inc.title}</div>
+                                                        <div className="text-xs text-slate-500 mb-2">Inmueble ID: {inc.property_id}</div>
 
-                                                <td className="py-4 px-6">
-                                                    <p className="text-sm text-slate-600 truncate max-w-[250px]" title={inc.description}>
-                                                        {inc.description}
-                                                    </p>
-                                                    <div className="text-xs text-slate-400 mt-1">Inquilino ID: {inc.tenant_id}</div>
-                                                </td>
-                                                <td>
-                                                    <p className="mb-0 text-truncate" style={{ maxWidth: "300px" }} title={inc.description}>
-                                                        {inc.description}
-                                                    </p>
-                                                    <small className="text-muted d-block">Inquilino ID: {inc.tenant_id}</small>
-                                                </td>
-                                                <td className="py-4 px-6 text-center">
-                                                    {getStatusBadge(inc.status)}
-                                                </td>
-
-                                                <td className="py-4 px-6"> <div className="flex flex-col gap-2 w-full max-w-[160px]">
-                                                    <select className="w-full text-[11px] font-bold uppercase tracking-wider border border-slate-200 text-slate-700 rounded-md py-1 px-2 focus:ring-red-500 bg-white shadow-sm cursor-pointer" value={inc.severity || ""}
-                                                        onChange={(e) => handleUpdateField(inc.id, "severity", e.target.value)}>
-                                                        <option value="">Severidad...</option> <option value="Baja">🟢 Baja</option> <option value="Media">🟡 Media</option> <option value="Alta">🔴 Alta</option>
-                                                    </select>
-                                                    <select className="w-full text-[11px] font-bold uppercase tracking-wider border border-slate-200 text-slate-700 rounded-md py-1 px-2 focus:ring-slate-800 bg-white shadow-sm cursor-pointer"
-                                                        value={inc.specialty || ""} onChange={(e) => handleUpdateField(inc.id, "specialty", e.target.value)}
-                                                    > <option value="">Especialidad...</option> <option value="Plomeria">Plomería</option> <option value="Electricidad"> Electricidad</option>
-                                                        <option value="Climatizacion">Climatización</option> <option value="General">General</option> </select><select className="w-full text-[11px] font-bold uppercase tracking-wider border border-emerald-200 text-emerald-800 rounded-md py-1 px-2 focus:ring-emerald-500 bg-emerald-50 shadow-sm cursor-pointer"
-                                                            value={inc.technician_id || ""} onChange={(e) => handleAssignTechnician(inc.id, e.target.value)} > <option value="">Sin técnico</option> {technicians.map((tech) => (<option key={tech.id} value={tech.id}> {tech.email} </option>))} </select> </div> </td>
-
-                                                <td className="py-4 px-6">
-                                                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
-                                                        {inc.status === "Pendiente" && (
-                                                            <button
-                                                                className="text-xs font-medium px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-md transition-colors border border-blue-200"
-                                                                onClick={() => handleUpdateStatus(inc.id, "En progreso")}
-                                                            >
-                                                                Iniciar
-                                                            </button>
-                                                        )}
-                                                        {inc.status !== "Resuelto" && (
-                                                            <button
-                                                                className="text-xs font-medium px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-md transition-colors border border-emerald-200"
-                                                                onClick={() => handleUpdateStatus(inc.id, "Resuelto")}
-                                                            >
-                                                                Resolver
-                                                            </button>
-                                                        )}
-                                                        {inc.status === "Resuelto" && (
+                                                        {inc.asset_name && (
                                                             <div className="flex items-center gap-2">
-                                                                <button
-                                                                    className="text-xs font-medium px-3 py-1.5 bg-white text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors border border-slate-200 shadow-sm flex items-center gap-1"
-                                                                    title="Descargar Reporte PDF"
-                                                                    onClick={() => window.open(`${backendUrl}/incidences/${inc.id}/pdf`, "_blank")}
-                                                                >
-                                                                    <ClipboardList className="w-3.5 h-3.5" /> PDF
-                                                                </button>
+                                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${criticalAssets.includes(inc.asset_name)
+                                                                    ? "bg-red-50 text-red-700 border-red-200"
+                                                                    : "bg-slate-100 text-slate-600 border-slate-200"
+                                                                    }`}>
+                                                                    {inc.asset_name}
+                                                                </span>
+                                                                {criticalAssets.includes(inc.asset_name) && (
+                                                                    <span className="text-xs font-bold text-red-600 animate-pulse">Crítico</span>
+                                                                )}
                                                             </div>
                                                         )}
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                                    </td>
+
+                                                    <td className="py-4 px-6">
+                                                        <p className="text-sm text-slate-600 truncate max-w-[250px]" title={inc.description}>
+                                                            {inc.description}
+                                                        </p>
+                                                        <div className="text-xs text-slate-400 mt-1">Inquilino ID: {inc.tenant_id}</div>
+                                                    </td>
+                                                    <td className="py-4 px-6 text-center">
+                                                        {getStatusBadge(inc.status)}
+                                                    </td>
+
+                                                    <td className="py-4 px-6"> <div className="flex flex-col gap-2 w-full max-w-[160px]">
+                                                        <select className="w-full text-[11px] font-bold uppercase tracking-wider border border-slate-200 text-slate-700 rounded-md py-1 px-2 focus:ring-red-500 bg-white shadow-sm cursor-pointer" value={inc.severity || ""}
+                                                            onChange={(e) => handleUpdateField(inc.id, "severity", e.target.value)}>
+                                                            <option value="">Severidad...</option> <option value="Baja">🟢 Baja</option> <option value="Media">🟡 Media</option> <option value="Alta">🔴 Alta</option>
+                                                        </select>
+                                                        <select className="w-full text-[11px] font-bold uppercase tracking-wider border border-slate-200 text-slate-700 rounded-md py-1 px-2 focus:ring-slate-800 bg-white shadow-sm cursor-pointer"
+                                                            value={inc.specialty || ""} onChange={(e) => handleUpdateField(inc.id, "specialty", e.target.value)}
+                                                        > <option value="">Especialidad...</option> <option value="Plomeria">Plomería</option> <option value="Electricidad"> Electricidad</option>
+                                                            <option value="Climatizacion">Climatización</option> <option value="General">General</option> </select><select className="w-full text-[11px] font-bold uppercase tracking-wider border border-emerald-200 text-emerald-800 rounded-md py-1 px-2 focus:ring-emerald-500 bg-emerald-50 shadow-sm cursor-pointer"
+                                                                value={inc.technician_id || ""} onChange={(e) => handleAssignTechnician(inc.id, e.target.value)} > <option value="">Sin técnico</option> {technicians.map((tech) => (<option key={tech.id} value={tech.id}> {tech.email} </option>))} </select> </div> </td>
+
+                                                    <td className="py-4 px-6">
+                                                        <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+                                                            {inc.status === "Pendiente" && (
+                                                                <button
+                                                                    className="text-xs font-medium px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-md transition-colors border border-blue-200"
+                                                                    onClick={() => handleUpdateStatus(inc.id, "En progreso")}
+                                                                >
+                                                                    Iniciar
+                                                                </button>
+                                                            )}
+                                                            {inc.status !== "Resuelto" && (
+                                                                <button
+                                                                    className="text-xs font-medium px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-md transition-colors border border-emerald-200"
+                                                                    onClick={() => handleUpdateStatus(inc.id, "Resuelto")}
+                                                                >
+                                                                    Resolver
+                                                                </button>
+                                                            )}
+                                                            {inc.status === "Resuelto" && (
+                                                                <div className="flex items-center gap-2">
+                                                                    <button
+                                                                        className="text-xs font-medium px-3 py-1.5 bg-white text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors border border-slate-200 shadow-sm flex items-center gap-1"
+                                                                        title="Descargar Reporte PDF"
+                                                                        onClick={() => window.open(`${backendUrl}/incidences/${inc.id}/pdf`, "_blank")}
+                                                                    >
+                                                                        <ClipboardList className="w-3.5 h-3.5" /> PDF
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
+                        </>
                     )}
                 </div>
             </div>

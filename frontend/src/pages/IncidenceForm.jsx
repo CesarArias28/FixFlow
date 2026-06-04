@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 import { apiClient } from "../apiClient";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,15 +11,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export const IncidenceForm = () => {
 
     const navigate = useNavigate();
+    const { store } = useGlobalReducer();
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [tenantId, setTenantId] = useState("1");
-    const [propertyId, setPropertyId] = useState("1");
+    const propertyId = store.property_id;
     const [assets, setAssets] = useState([]);
     const [assetId, setAssetId] = useState("");
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [statusMsg, setStatusMsg] = useState({ type: "", text: "" });
     const [loading, setLoading] = useState(false);
+
+
 
     useEffect(() => {
         const fetchAssets = async () => {
@@ -61,7 +64,7 @@ export const IncidenceForm = () => {
                 body: JSON.stringify({
                     title,
                     description,
-                    tenant_id: parseInt(tenantId),
+                    tenant_id: parseInt(store.userId),
                     property_id: parseInt(propertyId),
                     asset_id: assetId ? parseInt(assetId) : null
                 })
@@ -119,36 +122,9 @@ export const IncidenceForm = () => {
                                 required
                             ></textarea>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mt-4">
+                        <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-6 mt-4">
                             <div className="space-y-2">
-                                <Label htmlFor="tenant">Inquilino</Label>
-                                <Select value={tenantId} onValueChange={(value) => setTenantId(value)}>
-                                    <SelectTrigger id="tenant">
-                                        <SelectValue placeholder="Selecciona..." />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="1">Test User 1 (ID: 1)</SelectItem>
-                                        <SelectItem value="2">Test User 2 (ID: 2)</SelectItem>
-                                        <SelectItem value="3">Test User 3 (ID: 3)</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="property">Inmueble</Label>
-                                <Select value={propertyId} onValueChange={(value) => setPropertyId(value)}>
-                                    <SelectTrigger id="property">
-                                        <SelectValue placeholder="Selecciona..." />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="1">Calle Falsa 123 (ID: 1)</SelectItem>
-                                        <SelectItem value="2">Tanwa House (ID: 2)</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="asset">Activo (Opcional)</Label>
+                                <Label htmlFor="asset">Activo Afectado (Opcional)</Label>
                                 <Select value={assetId || "none"} onValueChange={(value) => setAssetId(value === "none" ? "" : value)}>
                                     <SelectTrigger id="asset">
                                         <SelectValue placeholder="Ninguno / No aplica" />

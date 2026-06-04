@@ -16,6 +16,7 @@ class User(db.Model):
     is_active: Mapped[bool] = mapped_column(Boolean(), default=True, nullable=False)
     phone_prefix: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
     phone_number: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    property_id: Mapped[Optional[int]] = mapped_column(ForeignKey('property.id'), nullable=True)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -27,6 +28,7 @@ class User(db.Model):
 class Property(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     address: Mapped[str] = mapped_column(String(200), nullable=False)
+    pin_code: Mapped[Optional[str]] = mapped_column(String(20), unique=True, nullable=True)
 
 class Asset(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
