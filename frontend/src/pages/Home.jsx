@@ -4,33 +4,38 @@ import useGlobalReducer from "../hooks/useGlobalReducer";
 import { Button } from "@/components/ui/button";
 
 export const Home = () => {
-    const { store } = useGlobalReducer();
+	const { store } = useGlobalReducer();
+	const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-    const getDashboardPath = () => {
-        if (store.role === "inquilino") return "/client-dashboard";
-        if (store.role === "tecnico") return "/technician";
-        return "/dashboard";
-    };
+	const getDashboardPath = () => {
+		if (store.role === "inquilino") return "/client-dashboard";
+		if (store.role === "tecnico") return "/technician";
+		return "/dashboard";
+	};
 	return (
 		<div className="min-h-[calc(100vh-80px)] bg-slate-50 flex flex-col overflow-hidden">
 			<div className="flex-1 w-full max-w-7xl mx-auto px-6 py-12 md:py-20 flex flex-col lg:flex-row items-center gap-12">
 				<div className="flex-1 text-left z-10 w-full lg:max-w-md xl:max-w-lg">
 					<h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold text-slate-900 leading-[1.15] mb-5 tracking-tight">
-						FixFlow: <br />
+						FixFlow <br />
 						Mantenimiento <br />
 						Inteligente para <br />
 						Propiedades <br />
 						Modernas
 					</h1>
 					<p className="text-lg md:text-[1.1rem] text-slate-600 mb-8 max-w-sm leading-relaxed font-light">
-						La plataforma PropTech definitiva. Reporta averías desde WhatsApp, clasifica con IA y optimiza tus flujos de trabajo en segundos.
+						La PropTech definitiva. Reportes directos por WhatsApp, clasificación automática por IA y flujos de trabajo optimizados en segundos.
 					</p>
 					<div className="flex flex-col sm:flex-row gap-4">
 						<Button asChild size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg h-12 px-6 text-base font-medium shadow-lg shadow-emerald-600/20">
-							<Link to="/incidence/new">Reportar Avería</Link>
+							{store.role === "administrador" || store.role === "inmobiliaria" ? (
+								<a href={`${backendUrl}/admin/incidence/new`} target="_blank" rel="noopener noreferrer">Reportar Avería</a>
+							) : (
+								<Link to="/incidence/new">Reportar Avería</Link>
+							)}
 						</Button>
 						<Button asChild size="lg" variant="outline" className="bg-white border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg h-12 px-6 text-base font-medium shadow-sm">
-							<Link to={getDashboardPath()}>Panel de Control</Link>
+							<Link to={getDashboardPath()}>Ver mi Panel de Control</Link>
 						</Button>
 					</div>
 				</div>

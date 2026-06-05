@@ -112,6 +112,27 @@ export const Dashboard = () => {
         }
     };
 
+    const handleDownloadPDF = async (incId) => {
+        try {
+            const response = await apiClient(`/incidences/${incId}/pdf`);
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `reporte_incidencia_${incId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } else {
+                alert("Error al descargar el PDF desde el servidor.");
+            }
+        } catch (err) {
+            alert("Error de red al intentar descargar el PDF.");
+        }
+    };
+
     const getStatusBadge = (status) => {
         switch (status) {
             case "Pendiente":
@@ -327,7 +348,9 @@ export const Dashboard = () => {
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
-                                            {(activeTab === "activas" ? incidences.filter(i => i.status !== "Resuelto") : incidences.filter(i => i.status === "Resuelto")).map((inc) => (
+                                            {(activeTab === "activas" ? incidences.filter(i => i.status !== "Resuelto") : incidences.filter(i => i.status === "Resuelto"))
+                                                .sort((a, b) => b.id - a.id)
+                                                .map((inc) => (
                                                 <tr key={inc.id} className="hover:bg-slate-50/50 transition-colors group">
 
                                                     <td className="py-4 px-6 text-sm font-semibold text-slate-900">
@@ -397,7 +420,7 @@ export const Dashboard = () => {
                                                                     <button
                                                                         className="text-xs font-medium px-3 py-1.5 bg-white text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors border border-slate-200 shadow-sm flex items-center gap-1"
                                                                         title="Descargar Reporte PDF"
-                                                                        onClick={() => window.open(`${backendUrl}/incidences/${inc.id}/pdf`, "_blank")}
+                                                                        onClick={() => handleDownloadPDF(inc.id)}
                                                                     >
                                                                         <ClipboardList className="w-3.5 h-3.5" /> PDF
                                                                     </button>

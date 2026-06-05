@@ -9,7 +9,12 @@ def send_whatsapp_notification(to_number, incidence_title, new_status):
     try:
         client = Client(account_sid, auth_token)
         
-        message_body = f"🛠️ *FixFlow Informa:*\nHola, te notificamos que tu incidencia '{incidence_title}' ha cambiado al estado: *{new_status}*."
+        if new_status == 'En progreso':
+            message_body = f"¡Hola! Buenas noticias, nuestro equipo técnico ya se ha puesto manos a la obra con tu reporte sobre '{incidence_title}'. Te avisaremos en cuanto esté solucionado. ¡Gracias por tu paciencia!"
+        elif new_status == 'Resuelto':
+            message_body = f" ✅ ¡Hola! Nos alegra comunicarte que tu avería '{incidence_title}' ya ha sido solucionada con éxito. Recuerda que puedes descargar el reporte completo en tu panel de FixFlow. ¡Que tengas un gran día!"
+        else:
+            message_body = f"¡Hola! Te escribimos de FixFlow para avisarte que tu reporte '{incidence_title}' ahora está en estado: *{new_status}*. ¡Te mantendremos informado!"
         
         to_whatsapp_number = f"whatsapp:{to_number}"
         

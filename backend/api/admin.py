@@ -5,9 +5,24 @@ from flask_admin import Admin
 from .models import db, User, Property, Incidence, Asset
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.theme import Bootstrap4Theme
+from flask_admin.menu import MenuLink
+from markupsafe import Markup
 
 
 class UserAdmin(ModelView):
+    form_ajax_refs = {
+        'property': {
+            'fields': ['address', 'id'],
+            'page_size': 10
+        }
+    }
+    
+    form_args = {
+        'property': {
+            'description': Markup('<a href="/admin/property/new/" target="_blank" style="color: #0d6efd; text-decoration: underline; font-weight: bold; margin-top: 5px; display: inline-block;">Registrar nueva propiedad</a>')
+        }
+    }
+
     form_choices = {
         'role': [
             ('inquilino', 'Inquilino'),
@@ -15,8 +30,16 @@ class UserAdmin(ModelView):
             ('administrador', 'Administrador/Inmobiliaria')
         ]
     }
+    
+    def on_model_change(self, form, model, is_created):
+        if model.password and not model.password.startswith('scrypt:'):
+            model.set_password(model.password)
+        super().on_model_change(form, model, is_created)
 
 class PropertyAdmin(ModelView):
+    create_modal = True
+    edit_modal = True
+
     def on_model_change(self, form, model, is_created):
         if not model.pin_code:
             model.pin_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
@@ -53,8 +76,19 @@ class IncidenceAdmin(ModelView):
     }
 def setup_admin(app):
     app.secret_key = os.environ.get('FLASK_APP_KEY', 'sample key')
-    admin = Admin(app, name='4Geeks Admin', theme=Bootstrap4Theme(swatch='cerulean'))
-    admin.add_view(UserAdmin(User, db.session))
+    
+    brand_html = Markup(
+        '<style>.navbar{background-color:#059669 !important;box-shadow:0 4px 6px -1px rgb(0 0 0/0.1);}.navbar-dark .navbar-nav .nav-link{color:rgba(255,255,255,0.8)!important;}.navbar-dark .navbar-nav .nav-link:hover{color:white!important;}</style>'
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 202 202" width="24" height="24" style="margin-right: 8px;">'
+        '<path fill="#ffffff" d="M66.24 164.09c.1-.14.73-1.76 1.38-3.61.67-1.83 2.41-6.73 3.89-10.85s3.22-8.96 3.85-10.75c1.34-3.81 4.38-12.29 6.33-17.73.75-2.09 1.74-4.87 2.19-6.19.95-2.76 1.8-3.89 3.25-4.26.57-.16 6.86-.28 19.92-.39l19.1-.16 1.87-.49c5.01-1.34 8.94-3.61 12.63-7.28 4.48-4.5 7.87-10.42 11.93-20.89.57-1.46 1.1-2.82 1.18-3 .14-.34-1.26-.36-27.6-.36H98.42v-.55c0-.61 1.46-5.44 4.89-16.12l2.15-6.71 8.96-.12c9.37-.12 10.46-.22 14.22-1.16 11.09-2.84 20.93-11.05 27.7-23.12 1.01-1.78 3.16-6.45 3.51-7.59l.14-.45h-32.9c-31.82 0-32.96.02-34.76.39-5.11 1.05-9.41 4.69-11.3 9.57-.3.77-1.5 4.18-2.7 7.59-2.29 6.63-7.2 20.46-10.97 30.97-1.26 3.53-2.78 7.75-3.35 9.37-.57 1.64-2.05 5.72-3.25 9.07-1.22 3.37-2.51 6.96-2.86 7.99-.36 1.03-1.74 4.85-3.06 8.48s-3.63 10.08-5.17 14.3c-1.52 4.24-3.35 9.39-4.1 11.44-.75 2.07-2.07 5.74-2.96 8.19-2.49 6.83-4.83 13.34-6.31 17.46-.75 2.07-1.62 4.48-1.95 5.39-.34.91-.61 1.68-.61 1.74 0 .04 7.26.08 16.16.08 12.68 0 16.2-.06 16.35-.24zm21.82-.99c.1-1.12.83-11.22 1.91-26.79.22-3.2.55-8.03.75-10.75.2-2.7.34-4.95.32-4.99-.04-.04-1.64 4.48-8.13 22.94-5.88 16.75-6.67 18.98-7.04 19.98l-.3.83h12.34l.14-1.22zm-44.35-53.42c.12-.37 1.58-4.32 3.24-8.78 5.96-16.1 12.88-34.98 14.99-40.93.53-1.46 1.05-2.9 1.16-3.2.12-.32.18-.55.12-.55S51.52 69.52 49.41 72c-1.32 1.56-6.67 7.69-15.98 18.35-8.64 9.86-16.83 19.37-17.14 19.88-.12.2 2.58.24 13.51.2l13.65-.06zm117.1-55.47c3.87-1.05 6.92-2.94 10-6.19 3.41-3.59 6.21-8.7 9-16.37.71-1.97 2.86-9.07 2.86-9.47 0-.04-3.18-.06-7.04-.04l-7.02.06-.3.89c-1.26 3.95-4.4 10.79-6.55 14.3-3.89 6.33-9.21 12.09-14.99 16.18l-1.87 1.32 7-.08c6.81-.08 7.06-.1 8.92-.59z"/>'
+        '<path fill="#ffffff" d="M32.75 164.8c0-.08.57-1.7 1.26-3.61s1.83-5.07 2.54-7.02c1.34-3.73 4.64-12.8 6.75-18.64a3647 3647 0 0 0 6.19-17.16c1.3-3.63 3.43-9.59 4.75-13.22s2.7-7.46 3.06-8.48c.36-1.03 1.64-4.62 2.86-7.99 1.2-3.35 2.68-7.44 3.25-9.07.57-1.62 2.09-5.84 3.35-9.37 3.77-10.51 8.68-24.34 10.97-30.97 1.2-3.41 2.41-6.83 2.7-7.59 1.89-4.87 6.19-8.52 11.3-9.57 1.8-.37 2.96-.39 35.55-.39 18.52 0 33.67.04 33.67.08 0 .28-1.16 3.25-2.05 5.23-4.06 9.05-10.85 17.16-18.46 22.09-3.35 2.17-7.48 3.98-11.2 4.95-3.77.95-4.85 1.05-14.22 1.16l-8.98.12-2.8 8.78c-1.54 4.83-3.1 9.82-3.49 11.11l-.69 2.31h21.28c21.19 0 21.28 0 21.28.39 0 .61-1.28 3.75-2.78 6.81-2.78 5.68-6.43 10.55-10.85 14.44-6.17 5.41-13.02 9.02-20.89 11.03l-2.64.67-8.01.12c-4.4.06-8.34.2-8.78.32-1.4.36-2.27 1.5-3.22 4.24-.45 1.32-1.44 4.1-2.19 6.19-1.95 5.44-4.99 13.93-6.33 17.73-.63 1.8-2.37 6.63-3.85 10.75s-3.22 9.02-3.89 10.85c-.65 1.85-1.28 3.47-1.38 3.61-.16.18-3.83.24-17.14.24-9.33 0-16.95-.06-16.95-.12z"/>'
+        '<path fill="#a78bfa" d="M75.06 163.59c.26-.75.99-2.84 1.64-4.69.65-1.83 3.24-9.17 5.72-16.27 2.51-7.1 5.48-15.58 6.63-18.82 1.14-3.24 2.09-5.92 2.09-5.96s.18-.08.41-.08c.39 0 .41.08.3 1.14-.12 1.1-.3 3.47-1.5 21.05-.95 13.63-1.58 22.39-1.72 23.73l-.12 1.22H74.59zm-60.11-53.06c.71-.97 10.16-11.93 18.56-21.56 8.38-9.57 13.91-15.9 15.31-17.56.65-.77 12.09-13.87 14.5-16.61.47-.55.83-.77 1.1-.73.39.08.34.3-1.05 4.12-3.2 8.94-9.9 27.26-15.54 42.51-1.81 4.89-3.41 9.19-3.55 9.57l-.24.69-14.74.06-14.74.04.37-.53zm86.52.18c.06-.12.67-.26 1.34-.34 1.7-.2 5.98-1.3 8.25-2.13 8.9-3.24 16.61-8.74 22.03-15.72 2.68-3.45 5.56-8.62 7.28-13.06l.73-1.93h6.88c3.77 0 6.86.06 6.86.12 0 .37-3.65 9.37-4.95 12.17-5.33 11.56-11.9 17.85-21.28 20.42l-1.87.51-12.68.08c-8.05.04-12.66 0-12.59-.12m41.27-55.32c.04-.08 1.08-.81 2.31-1.66 3.18-2.17 5.42-4.04 8.07-6.73 4.48-4.54 7.28-8.44 10.42-14.56 1.34-2.64 3.41-7.56 4.18-9.96l.3-.89 7.73-.06 7.75-.04-.14.71c-.28 1.48-2.07 7.57-2.96 10.02-2.78 7.67-5.58 12.78-9 16.37-3.08 3.27-6.15 5.17-10 6.17-1.64.43-2.45.51-5.46.57-7.97.18-13.28.18-13.2.04z"/>'
+        '</svg>'
+        'FixFlow Admin'
+    )
+    admin = Admin(app, name=brand_html, theme=Bootstrap4Theme())
     admin.add_view(PropertyAdmin(Property, db.session))
     admin.add_view(AssetAdmin(Asset, db.session))
+    admin.add_view(UserAdmin(User, db.session))
     admin.add_view(IncidenceAdmin(Incidence, db.session))
+    admin.add_link(MenuLink(name='Volver a FixFlow', category='', url='http://localhost:5173/dashboard'))

@@ -96,7 +96,9 @@ export const ClientDashboard = () => {
                 </Card>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {incidences.map((inc) => (
+                    {[...incidences]
+                        .sort((a, b) => b.id - a.id)
+                        .map((inc) => (
                         <Card key={inc.id} className="flex flex-col hover:shadow-md transition-shadow">
                             <CardHeader className="pb-3 flex-row items-start justify-between space-y-0 gap-2">
                                 <div className="space-y-1">

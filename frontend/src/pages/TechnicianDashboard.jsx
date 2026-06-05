@@ -56,6 +56,27 @@ export const TechnicianDashboard = () => {
         }
     };
 
+    const handleDownloadPDF = async (incId) => {
+        try {
+            const response = await apiClient(`/incidences/${incId}/pdf`);
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `reporte_incidencia_${incId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } else {
+                alert("Error al descargar el PDF desde el servidor.");
+            }
+        } catch (err) {
+            alert("Error de red al intentar descargar el PDF.");
+        }
+    };
+
     const getStatusBadge = (status) => {
         switch (status) {
             case "Pendiente":
@@ -102,7 +123,9 @@ export const TechnicianDashboard = () => {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        {incidences.map((inc) => (
+                        {[...incidences]
+                            .sort((a, b) => b.id - a.id)
+                            .map((inc) => (
                             <div key={inc.id} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
                                 <div className="flex justify-between items-start mb-3">
                                     <div className="pr-4">
@@ -157,9 +180,9 @@ export const TechnicianDashboard = () => {
                                             <span className="text-emerald-700 font-bold text-sm flex items-center gap-2">
                                                 <CheckCircle2 className="w-4 h-4" /> Completada
                                             </span>
-                                            <button
-                                                className="text-slate-600 hover:text-red-600 text-sm font-medium flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm"
-                                                onClick={() => window.open(`${backendUrl}/incidences/${inc.id}/pdf`, "_blank")}
+                                            <button 
+                                                className="text-slate-600 hover:text-red-600 text-sm font-medium flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm transition-colors"
+                                                onClick={() => handleDownloadPDF(inc.id)}
                                             >
                                                 <ClipboardList className="w-3 h-3" /> PDF
                                             </button>

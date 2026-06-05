@@ -4,6 +4,7 @@ from sqlalchemy import String, Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from typing import Optional
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 
 db = SQLAlchemy()
@@ -17,6 +18,10 @@ class User(db.Model):
     phone_prefix: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
     phone_number: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
     property_id: Mapped[Optional[int]] = mapped_column(ForeignKey('property.id'), nullable=True)
+    property = db.relationship('Property', backref='users')
+
+    def __str__(self):
+        return f"{self.email} ({self.role})"
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -30,6 +35,9 @@ class Property(db.Model):
     address: Mapped[str] = mapped_column(String(200), nullable=False)
     pin_code: Mapped[Optional[str]] = mapped_column(String(20), unique=True, nullable=True)
 
+    def __str__(self):
+        return f"{self.address}"
+
 class Asset(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -38,6 +46,9 @@ class Asset(db.Model):
     def __init__(self, name: str, property_id: int):
         self.name = name
         self.property_id = property_id
+
+    def __str__(self):
+        return f"{self.name}"
 
 
 class Incidence(db.Model):
@@ -48,12 +59,16 @@ class Incidence(db.Model):
     severity: Mapped[Optional[str]] = mapped_column(db.String(20), nullable=True) 
     specialty: Mapped[Optional[str]] = mapped_column(db.String(50), nullable=True)
     asset_id: Mapped[Optional[int]] = mapped_column(ForeignKey('asset.id'), nullable=True)
+    resolved_at: Mapped[Optional[datetime]] = mapped_column(db.DateTime, nullable=True)
     asset = db.relationship('Asset', backref='incidences')
       
     tenant_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
     property_id: Mapped[int] = mapped_column(ForeignKey('property.id'), nullable=False)
     property = db.relationship('Property', backref='incidences')
     technician_id: Mapped[Optional[int]] = mapped_column(ForeignKey('user.id'), nullable=True)
+
+    def __str__(self):
+        return f"Incidencia #{self.id} - {self.title}"
 
 
 

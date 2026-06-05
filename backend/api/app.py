@@ -17,8 +17,10 @@ from api.admin import setup_admin
 from datetime import timedelta
 from api.services.twilio_service import send_whatsapp_notification
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
 from werkzeug.security import generate_password_hash
 import secrets
+from datetime import datetime
 
 reset_token = secrets.token_urlsafe(32)
 
@@ -293,7 +295,10 @@ def download_incidence_pdf(id):
     story.append(Paragraph(f"Detalle formal de la avería registrada #{incidence.id}", subtitle_style))
     story.append(Spacer(1, 10))
 
+    current_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
     data = [
+        [Paragraph("Fecha de Generación:", label_style), Paragraph(current_date, value_style)],
         [Paragraph("Título de la Avería:", label_style), Paragraph(incidence.title, value_style)],
         [Paragraph("Descripción:", label_style), Paragraph(incidence.description, value_style)],
         [Paragraph("Estado Actual:", label_style), Paragraph(incidence.status, value_style)],
@@ -304,6 +309,10 @@ def download_incidence_pdf(id):
         [Paragraph("Técnico Responsable:", label_style), Paragraph(tech.email if tech else "Sin técnico asignado", value_style)],
         [Paragraph("Equipo / Activo afectado:", label_style), Paragraph(incidence.asset.name if incidence.asset else "No aplica", value_style)],
     ]
+    
+    if incidence.resolved_at:
+        resolved_date_str = incidence.resolved_at.strftime("%d/%m/%Y %H:%M:%S")
+        data.insert(1, [Paragraph("Fecha de Resolución:", label_style), Paragraph(resolved_date_str, value_style)])
 
     table = Table(data, colWidths=[140, 360])
     table.setStyle(TableStyle([
@@ -347,6 +356,12 @@ def update_incidence(id):
 
     if 'status' in data:
         incidence.status = data['status']
+        if data['status'] == 'Resuelto':
+            incidence.resolved_at = datetime.now()
+        else:
+            # Si se vuelve a poner "En progreso", borramos la fecha de resolución
+            incidence.resolved_at = None
+
     if 'severity' in data:
         incidence.severity = data['severity']
     if 'specialty' in data:
