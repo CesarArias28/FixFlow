@@ -3,7 +3,7 @@ from flask_sqlalchemy import query
 from sqlalchemy.sql import roles
 import os
 import io
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 from flask_migrate import Migrate
 from api.models import db, User, Property, Incidence, Asset
@@ -24,7 +24,8 @@ from datetime import datetime
 
 reset_token = secrets.token_urlsafe(32)
 
-app = Flask(__name__)
+static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'frontend', 'dist')
+app = Flask(__name__, static_folder=static_file_dir, static_url_path='')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///triage.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -458,7 +459,13 @@ def create_asset():
     return jsonify({"message": "Activo creado con éxito", "id": new_asset.id}), 201
 
 
-
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
 
 if __name__ == '__main__':
     with app.app_context():
