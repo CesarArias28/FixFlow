@@ -15,7 +15,10 @@ export const Login = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || "/api";
+    const rawBackendUrl = import.meta.env.VITE_BACKEND_URL || "/api";
+    const backendUrl = rawBackendUrl.endsWith('/api') 
+        ? rawBackendUrl 
+        : (rawBackendUrl.startsWith('http') ? `${rawBackendUrl}/api` : '/api');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -51,7 +54,7 @@ export const Login = () => {
                     }
                 });
 
-                if (data.role === "administrador" || data.role === "inmobiliaria") {
+                if (data.role === "administrador" || data.role === "inmobiliaria" || data.role === "admin") {
                     navigate("/dashboard");
                 } else if (data.role === "tecnico") {
                     navigate("/technician");
