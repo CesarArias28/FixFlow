@@ -4,7 +4,6 @@ import random
 from flask_admin import Admin
 from .models import db, User, Property, Incidence, Asset
 from flask_admin.contrib.sqla import ModelView
-from flask_admin.theme import Bootstrap4Theme
 from flask_admin.menu import MenuLink
 from markupsafe import Markup
 
@@ -86,7 +85,7 @@ def setup_admin(app):
         '</svg>'
         'FixFlow Admin'
     )
-    admin = Admin(app, name=brand_html, theme=Bootstrap4Theme())
+    admin = Admin(app, name=brand_html, template_mode='bootstrap4')
     admin.add_view(PropertyAdmin(Property, db.session))
     admin.add_view(AssetAdmin(Asset, db.session))
     admin.add_view(UserAdmin(User, db.session))
