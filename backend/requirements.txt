@@ -25,4 +25,4 @@ certifi==2024.2.2
 python-editor==1.0.4
 twilio==9.10.9
 PyJWT==2.10.1
-reportlab==4.2.2
+reportlab==4.0.0

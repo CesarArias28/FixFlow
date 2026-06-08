@@ -9,6 +9,8 @@ npm install
 npm run build
 # Install backend dependencies and migrate
 cd ../backend
+pipenv install antes
+pipenv run upgrade antes 
 pip install -r requirements.txt
-python -m flask db upgrade 
+python -m flask db upgrade  
 
