@@ -11,7 +11,7 @@ export const ResetPassword = () => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: "", text: "" });
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "/api";
 
     const handleResetPassword = async (e) => {
         e.preventDefault();

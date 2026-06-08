@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { apiClient } from "../apiClient";
 import { Wrench, MapPin, CheckCircle2, ClipboardList, AlertCircle } from "lucide-react";
 
 export const TechnicianDashboard = () => {
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (!localStorage.getItem("token")) {
+            navigate("/login");
+        }
+    }, [navigate]);
     const { store } = useGlobalReducer();
     const [incidences, setIncidences] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "/api";
     const techId = store.userId;
 
     const fetchAssignedIncidences = async () => {

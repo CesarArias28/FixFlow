@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiClient } from "../apiClient";
 import { RefreshCw, ClipboardList, Clock, CheckCircle, AlertTriangle } from "lucide-react";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 export const Dashboard = () => {
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (!localStorage.getItem("token")) {
+            navigate("/login");
+        }
+    }, [navigate]);
     const [incidences, setIncidences] = useState([]);
     const [activeTab, setActiveTab] = useState("activas");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [technicians, setTechnicians] = useState([]);
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "/api";
 
     const fetchIncidences = async () => {
         setLoading(true);

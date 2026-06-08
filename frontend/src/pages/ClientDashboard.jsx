@@ -9,10 +9,15 @@ import { Wrench, Plus, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 export const ClientDashboard = () => {
     const { store } = useGlobalReducer();
     const navigate = useNavigate();
+    useEffect(() => {
+        if (!localStorage.getItem("token")) {
+            navigate("/login");
+        }
+    }, [navigate]);
     const [incidences, setIncidences] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "/api";
 
     useEffect(() => {
         if (!store.token) {

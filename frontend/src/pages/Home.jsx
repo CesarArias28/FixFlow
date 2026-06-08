@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export const Home = () => {
 	const { store } = useGlobalReducer();
-	const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+	const backendUrl = import.meta.env.VITE_BACKEND_URL || "/api";
 
 	const getDashboardPath = () => {
 		if (store.role === "inquilino") return "/client-dashboard";
@@ -29,7 +29,7 @@ export const Home = () => {
 					<div className="flex flex-col sm:flex-row gap-4">
 						<Button asChild size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg h-12 px-6 text-base font-medium shadow-lg shadow-emerald-600/20">
 							{store.role === "administrador" || store.role === "inmobiliaria" ? (
-								<a href={`${backendUrl}/admin/incidence/new`} target="_blank" rel="noopener noreferrer">Reportar Avería</a>
+								<a href="/admin/incidence/new" target="_blank" rel="noopener noreferrer">Reportar Avería</a>
 							) : (
 								<Link to="/incidence/new">Reportar Avería</Link>
 							)}

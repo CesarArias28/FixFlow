@@ -17,7 +17,7 @@ export const Register = () => {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "/api";
 
     const handleSubmit = async (e) => {
         e.preventDefault();

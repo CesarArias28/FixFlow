@@ -12,6 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export const IncidenceForm = () => {
 
     const navigate = useNavigate();
+    useEffect(() => {
+        if (!localStorage.getItem("token")) {
+            navigate("/login");
+        }
+    }, [navigate]);
     const { store } = useGlobalReducer();
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -19,7 +24,7 @@ export const IncidenceForm = () => {
     const [assets, setAssets] = useState([]);
     const [assetId, setAssetId] = useState("");
     const [customAssetName, setCustomAssetName] = useState("");
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "/api";
     const [statusMsg, setStatusMsg] = useState({ type: "", text: "" });
     const [loading, setLoading] = useState(false);
 

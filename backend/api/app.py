@@ -38,7 +38,7 @@ CORS(app)
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "super-secret-key-change-it")
 jwt = JWTManager(app)
 
-@app.route('/login', methods=['POST'])
+@app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
     email = data.get("email")
@@ -64,7 +64,7 @@ def login():
         "property_id": user.property_id
     }), 200
 
-@app.route('/signup', methods=['POST'])
+@app.route('/api/signup', methods=['POST'])
 def signup():
     data = request.get_json()
     email = data.get("email")
@@ -97,7 +97,7 @@ def signup():
     return jsonify({"message": "Registro completado con éxito"}), 201
 
 
-@app.route('/forgot-password', methods=['POST'])
+@app.route('/api/forgot-password', methods=['POST'])
 def forgot_password():
     data = request.get_json()
     email = data.get("email")
@@ -128,7 +128,7 @@ def forgot_password():
 
 
 
-@app.route('/reset-password', methods=['POST'])
+@app.route('/api/reset-password', methods=['POST'])
 def reset_password():
     data = request.get_json()
     token = data.get("token")
@@ -156,7 +156,7 @@ def reset_password():
 
 
 
-@app.route('/incidences', methods=['POST'])
+@app.route('/api/incidences', methods=['POST'])
 @jwt_required()
 def create_incidence():
     current_user_id = get_jwt_identity()
@@ -188,7 +188,7 @@ def create_incidence():
     db.session.commit()
     return jsonify({"message": "Incidencia creada"}), 201
 
-@app.route('/incidences', methods=['GET'])
+@app.route('/api/incidences', methods=['GET'])
 @jwt_required()
 def get_incidences():
     current_user_id = get_jwt_identity()
@@ -218,7 +218,7 @@ def get_incidences():
         } for inc in incidences]
     return jsonify(incidences_list)
 
-@app.route('/incidences/<int:id>', methods=['GET'])
+@app.route('/api/incidences/<int:id>', methods=['GET'])
 @jwt_required()
 def get_incidence(id):
     incidence = Incidence.query.get(id)
@@ -241,7 +241,7 @@ def get_incidence(id):
         "asset_name": incidence.asset.name if incidence.asset else None
     }), 200
 
-@app.route('/incidences/<int:id>/pdf', methods=['GET'])
+@app.route('/api/incidences/<int:id>/pdf', methods=['GET'])
 @jwt_required()
 def download_incidence_pdf(id):
     incidence = Incidence.query.get(id)
@@ -343,7 +343,7 @@ def download_incidence_pdf(id):
 
 
 
-@app.route('/incidences/<int:id>', methods=['PUT'])
+@app.route('/api/incidences/<int:id>', methods=['PUT'])
 @jwt_required()
 def update_incidence(id):
     incidence = Incidence.query.get(id)
@@ -388,7 +388,7 @@ def update_incidence(id):
     
     
     
-@app.route('/incidences/<int:id>', methods=['DELETE'])
+@app.route('/api/incidences/<int:id>', methods=['DELETE'])
 @jwt_required()
 def delete_incidence(id):
     incidence = Incidence.query.get(id)
@@ -401,21 +401,21 @@ def delete_incidence(id):
     return jsonify({"message": "Incidencia eliminada"}), 200
 
 
-@app.route('/tenants', methods=['GET'])
+@app.route('/api/tenants', methods=['GET'])
 @jwt_required()
 def get_tenants():
     tenants = User.query.filter_by(role='inquilino').all()
     tenants_list = [{"id": t.id, "email": t.email} for t in tenants]
     return jsonify(tenants_list), 200
 
-@app.route('/properties', methods=['GET'])
+@app.route('/api/properties', methods=['GET'])
 @jwt_required()
 def get_properties():
     properties = Property.query.all()
     props_list = [{"id": p.id, "address": p.address} for p in properties]
     return jsonify(props_list), 200
 
-@app.route('/technicians', methods=['GET'])
+@app.route('/api/technicians', methods=['GET'])
 @jwt_required()
 def get_technicians():
     technicians = User.query.filter_by(role='tecnico').all()
@@ -427,7 +427,7 @@ def get_technicians():
     } for tech in technicians]
     return jsonify(technicians_list), 200
 
-@app.route('/assets', methods=['GET'])
+@app.route('/api/assets', methods=['GET'])
 @jwt_required()
 def get_assets():
     property_id = request.args.get('property_id') 
@@ -443,7 +443,7 @@ def get_assets():
     return jsonify(assets_list), 200
 
 
-@app.route('/assets', methods=['POST'])
+@app.route('/api/assets', methods=['POST'])
 @jwt_required()
 def create_asset():
     data = request.get_json()
@@ -457,6 +457,33 @@ def create_asset():
     db.session.add(new_asset)
     db.session.commit()
     return jsonify({"message": "Activo creado con éxito", "id": new_asset.id}), 201
+
+@app.route('/api/bootstrap', methods=['GET', 'POST'])
+def bootstrap():
+    admin_user = User.query.filter_by(email="admin@fixflow.com").first()
+    if not admin_user:
+        admin_user = User(email="admin@fixflow.com", role="administrador")
+        db.session.add(admin_user)
+    
+    admin_user.set_password("admin")
+    admin_user.role = "administrador"
+    admin_user.is_active = True
+    db.session.commit()
+    
+    return jsonify({
+        "message": "¡Usuario administrador forzado con éxito!",
+        "email": "admin@fixflow.com",
+        "password": "admin"
+    }), 201
+
+@app.route('/api/load-seed', methods=['GET'])
+def load_seed_route():
+    try:
+        from load_seed_data import load_data
+        load_data()
+        return jsonify({"message": "¡Base de datos cargada con éxito desde seed_data.json!"}), 200
+    except Exception as e:
+        return jsonify({"message": f"Error al cargar: {str(e)}"}), 500
 
 
 @app.route('/', defaults={'path': ''})

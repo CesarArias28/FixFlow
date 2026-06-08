@@ -93,7 +93,7 @@ export const Navbar = () => {
                                 {(store.role === "administrador" || store.role === "inmobiliaria") && (
                                     <DropdownMenuItem 
                                         className="p-3 text-blue-600 focus:bg-blue-50 focus:text-blue-700 cursor-pointer rounded-lg transition-colors"
-                                        onClick={() => window.open(import.meta.env.VITE_BACKEND_URL + '/admin', '_blank')}
+                                        onClick={() => window.open('/admin', '_blank')}
                                     >
                                         <Settings className="w-4 h-4 mr-2" />
                                         <span className="font-medium">Backoffice (SuperAdmin)</span>

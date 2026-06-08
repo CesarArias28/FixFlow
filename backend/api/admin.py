@@ -4,11 +4,38 @@ import random
 from flask_admin import Admin
 from .models import db, User, Property, Incidence, Asset
 from flask_admin.contrib.sqla import ModelView
+
+from flask import request, Response
+from werkzeug.exceptions import HTTPException
+
+class AuthException(HTTPException):
+    def __init__(self, message):
+        super().__init__(message, Response(
+            "You could not be authenticated. Please refresh the page.", 401,
+            {'WWW-Authenticate': 'Basic realm="Login Required"'}
+        ))
+
+class SecureModelView(ModelView):
+    def is_accessible(self):
+        auth = request.authorization
+        if not auth or not auth.username or not auth.password:
+            raise AuthException('Not authenticated.')
+        
+        user = User.query.filter_by(email=auth.username).first()
+        if not user or user.password != auth.password:
+            if not user or not user.check_password(auth.password):
+                raise AuthException('Not authenticated.')
+            
+        if user.role not in ['admin', 'administrador']:
+            raise AuthException('Not authorized.')
+            
+        return True
+
 from flask_admin.menu import MenuLink
 from markupsafe import Markup
 
 
-class UserAdmin(ModelView):
+class UserAdmin(SecureModelView):
     form_ajax_refs = {
         'property': {
             'fields': ['address', 'id'],
@@ -35,23 +62,29 @@ class UserAdmin(ModelView):
             model.set_password(model.password)
         super().on_model_change(form, model, is_created)
 
-class PropertyAdmin(ModelView):
+from flask import flash
+
+class PropertyAdmin(SecureModelView):
     create_modal = True
     edit_modal = True
 
     def on_model_change(self, form, model, is_created):
-        if not model.pin_code:
-            model.pin_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-        super().on_model_change(form, model, is_created)
+        try:
+            if not model.pin_code:
+                model.pin_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+            super().on_model_change(form, model, is_created)
+        except Exception as e:
+            flash(f"Error al guardar: {str(e)}", 'error')
+            raise e
 
-class AssetAdmin(ModelView):
+class AssetAdmin(SecureModelView):
     form_args = {
         'name': {
             'description': 'Ej: Ascensor A, Caldera, Puerta Garaje, Piscina. Escribe el nombre del activo.'
         }
     }
 
-class IncidenceAdmin(ModelView):
+class IncidenceAdmin(SecureModelView):
     form_choices = {
         'status': [
             ('Pendiente', 'Pendiente'),
@@ -90,4 +123,4 @@ def setup_admin(app):
     admin.add_view(AssetAdmin(Asset, db.session))
     admin.add_view(UserAdmin(User, db.session))
     admin.add_view(IncidenceAdmin(Incidence, db.session))
-    admin.add_link(MenuLink(name='Volver a FixFlow', category='', url='http://localhost:5173/dashboard'))
+    admin.add_link(MenuLink(name='Volver a FixFlow', category='', url='/dashboard'))

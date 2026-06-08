@@ -1,4 +1,4 @@
-const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "/api";
 export const apiClient = async (endpoint, options = {}) => {
     const token = localStorage.getItem("token");
 

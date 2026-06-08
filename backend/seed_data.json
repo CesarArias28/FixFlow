@@ -1,0 +1,512 @@
+{
+  "user": [
+    {
+      "id": 1,
+      "email": "test_user1@test.com",
+      "password": "123456",
+      "is_active": 1,
+      "role": "inmobiliaria",
+      "phone_prefix": null,
+      "phone_number": null,
+      "property_id": null
+    },
+    {
+      "id": 2,
+      "email": "test_user2@test.com",
+      "password": "123456",
+      "is_active": 1,
+      "role": "administrador",
+      "phone_prefix": null,
+      "phone_number": null,
+      "property_id": null
+    },
+    {
+      "id": 3,
+      "email": "test_user3@test.com",
+      "password": "123456",
+      "is_active": 1,
+      "role": "inquilino",
+      "phone_prefix": "+34",
+      "phone_number": "697338607",
+      "property_id": null
+    },
+    {
+      "id": 4,
+      "email": "tecnico@fixflow.com",
+      "password": "scrypt:32768:8:1$FI5HCfLsdJfbiqAz$1dbc7ca21d31f6406e15bd841cf916c225abef10443baee6d4193944e74115687fdd8a04858f0583d21649ed6e9d5d632f68f94fcdbf3be9afda25502b2005ca",
+      "is_active": 1,
+      "role": "tecnico",
+      "phone_prefix": null,
+      "phone_number": null,
+      "property_id": null
+    },
+    {
+      "id": 5,
+      "email": "admin@fixflow.com",
+      "password": "scrypt:32768:8:1$uYElr4b6uqKveXEU$0d50e672801d4052fb31f0fb90f2ad18ebe6d3bdf87b6e9a60f54de653d374c61e71aa4a667bdf9997e254658cc3653b97824999e3cdc07a1692d0bf533ebe3e",
+      "is_active": 1,
+      "role": "administrador",
+      "phone_prefix": null,
+      "phone_number": null,
+      "property_id": null
+    },
+    {
+      "id": 6,
+      "email": "cliente@fixflow.com",
+      "password": "scrypt:32768:8:1$o2XvrpBfJvbUwvSV$7d3388dd29d773916ad219e18a04af8b39899a9b51845de7b3f1ac06f9eee9371e2da73e1cdefdceef40217c1e34e0507eb65999c821046892ae1307d1afcdca",
+      "is_active": 1,
+      "role": "inquilino",
+      "phone_prefix": "+34",
+      "phone_number": "697338607",
+      "property_id": 1
+    },
+    {
+      "id": 7,
+      "email": "cliente1@fixflow.com",
+      "password": "scrypt:32768:8:1$PZvAVzF1N1uAdytw$3222690b4340f226d558de6ce25b083050c12d627ef87c13a403480d3450d81c6a8a49fa4e8f80fa58740a8f7b978f73ffabcbd39938c08d850f8febbb092638",
+      "is_active": 1,
+      "role": "inquilino",
+      "phone_prefix": "+34",
+      "phone_number": "697338607",
+      "property_id": 8
+    },
+    {
+      "id": 8,
+      "email": "test_9344@fixflow.com",
+      "password": "scrypt:32768:8:1$YcqLoyMFGKEHcGIB$dee93f1d78f076941c32aea498474bc632d0a724734fecfce376e0a93ff0059fc51d68d82faf8caea7ebc4f0860601864e9d2e5ee7c9b2a52a70f819983511ff",
+      "is_active": 1,
+      "role": "inquilino",
+      "phone_prefix": "+34",
+      "phone_number": "697338607",
+      "property_id": 1
+    },
+    {
+      "id": 9,
+      "email": "cliente2@fixflow.com",
+      "password": "scrypt:32768:8:1$TvneEZmnAWBXboOK$060106557d84f712c654ae688d3124580dbb37b0bc7f1feace34243f0e887008e719aae55a8f1cbc6bfdd41900e26a1c3f6bf7d01240bb4543c1598eee586268",
+      "is_active": 1,
+      "role": "inquilino",
+      "phone_prefix": "+34",
+      "phone_number": "697338607",
+      "property_id": 1
+    }
+  ],
+  "property": [
+    {
+      "id": 1,
+      "address": "Calle Falsa 123",
+      "pin_code": "2T3IZ8"
+    },
+    {
+      "id": 2,
+      "address": "TANWA HOUSE 37 Sri Ping Muang Rd, Tambon Hai Ya, อำเภอเมือง Chiang Mai 50100, Tailandia",
+      "pin_code": "FACL3U"
+    },
+    {
+      "id": 3,
+      "address": "Torre Empresarial Norte",
+      "pin_code": "GC1PT0"
+    },
+    {
+      "id": 4,
+      "address": "Residencial Los Pinos",
+      "pin_code": "FR3IBD"
+    },
+    {
+      "id": 5,
+      "address": "Edificio Gran Via 42",
+      "pin_code": "VJCDMN"
+    },
+    {
+      "id": 6,
+      "address": "valencia 28 ",
+      "pin_code": "7789"
+    },
+    {
+      "id": 7,
+      "address": "TANWA HOUSE 37 Sri Ping Muang Rd, Tambon Hai Ya, อำเภอเมือง Chiang Mai 50100, Tailandia",
+      "pin_code": "8965"
+    },
+    {
+      "id": 8,
+      "address": "Barcelona ",
+      "pin_code": "1234"
+    }
+  ],
+  "asset": [
+    {
+      "id": 1,
+      "name": "Caldera Central",
+      "property_id": 1
+    },
+    {
+      "id": 2,
+      "name": "Cocina",
+      "property_id": 1
+    },
+    {
+      "id": 3,
+      "name": "Lavavajillas",
+      "property_id": 1
+    },
+    {
+      "id": 4,
+      "name": "Aire Acondicionado Central",
+      "property_id": 1
+    },
+    {
+      "id": 5,
+      "name": "Bomba de Agua",
+      "property_id": 1
+    },
+    {
+      "id": 6,
+      "name": "Calentador",
+      "property_id": 3
+    },
+    {
+      "id": 7,
+      "name": "Sistema HVAC",
+      "property_id": 3
+    },
+    {
+      "id": 8,
+      "name": "Generador Electrico",
+      "property_id": 3
+    },
+    {
+      "id": 9,
+      "name": "Puerta del Garaje",
+      "property_id": 4
+    },
+    {
+      "id": 10,
+      "name": "Bomba de Agua Piscina",
+      "property_id": 4
+    },
+    {
+      "id": 11,
+      "name": "Caldera Central",
+      "property_id": 5
+    },
+    {
+      "id": 12,
+      "name": "Ascensor Servicio",
+      "property_id": 5
+    }
+  ],
+  "incidence": [
+    {
+      "id": 1,
+      "title": "Fuga de agua ",
+      "description": "El lava tiene fuga de agua",
+      "status": "Resuelto",
+      "severity": null,
+      "specialty": null,
+      "tenant_id": 1,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": null,
+      "resolved_at": null
+    },
+    {
+      "id": 2,
+      "title": "fallo de presión en la caldera",
+      "description": "fallo en la caldera\n",
+      "status": "Resuelto",
+      "severity": null,
+      "specialty": null,
+      "tenant_id": 1,
+      "property_id": 1,
+      "technician_id": null,
+      "asset_id": 1,
+      "resolved_at": null
+    },
+    {
+      "id": 3,
+      "title": "Ruidos extraños en la caldera",
+      "description": "la caldera hace ruidos extraños",
+      "status": "Resuelto",
+      "severity": "Media",
+      "specialty": "Plomeria",
+      "tenant_id": 1,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 1,
+      "resolved_at": null
+    },
+    {
+      "id": 4,
+      "title": "goteo de agua",
+      "description": "goteo constante de agua en la caldera",
+      "status": "Resuelto",
+      "severity": null,
+      "specialty": null,
+      "tenant_id": 1,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 1,
+      "resolved_at": null
+    },
+    {
+      "id": 5,
+      "title": "Aire acondicionado gote",
+      "description": "El aire acondicionado gotea\n",
+      "status": "Resuelto",
+      "severity": null,
+      "specialty": null,
+      "tenant_id": 1,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 4,
+      "resolved_at": null
+    },
+    {
+      "id": 6,
+      "title": "Fuga de agua",
+      "description": "cocina\n",
+      "status": "Resuelto",
+      "severity": "Alta",
+      "specialty": "General",
+      "tenant_id": 1,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": null,
+      "resolved_at": null
+    },
+    {
+      "id": 7,
+      "title": "Horno dañado",
+      "description": "el horno ta prendio en candela",
+      "status": "Resuelto",
+      "severity": "Alta",
+      "specialty": "",
+      "tenant_id": 3,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 1,
+      "resolved_at": null
+    },
+    {
+      "id": 8,
+      "title": "Fuga de cocina",
+      "description": "se prendio todo ",
+      "status": "Resuelto",
+      "severity": "Alta",
+      "specialty": "General",
+      "tenant_id": 6,
+      "property_id": 4,
+      "technician_id": 4,
+      "asset_id": 9,
+      "resolved_at": null
+    },
+    {
+      "id": 9,
+      "title": "puerta dañada",
+      "description": "Se daño",
+      "status": "Resuelto",
+      "severity": "Alta",
+      "specialty": "General",
+      "tenant_id": 6,
+      "property_id": 3,
+      "technician_id": 4,
+      "asset_id": 6,
+      "resolved_at": null
+    },
+    {
+      "id": 10,
+      "title": "Se rompió la puerta del garaje ",
+      "description": "Se quebro la puerta\n",
+      "status": "Resuelto",
+      "severity": "Alta",
+      "specialty": "General",
+      "tenant_id": 7,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 3,
+      "resolved_at": null
+    },
+    {
+      "id": 11,
+      "title": "Averia Test E2E",
+      "description": "Esto es una averia generada automaticamente",
+      "status": "Resuelto",
+      "severity": "Alta",
+      "specialty": "Plomeria",
+      "tenant_id": 8,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": null,
+      "resolved_at": null
+    },
+    {
+      "id": 12,
+      "title": "La bomba de agua se daño",
+      "description": "sale agua de la bomba de agua",
+      "status": "Resuelto",
+      "severity": "Media",
+      "specialty": "Plomeria",
+      "tenant_id": 9,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 5,
+      "resolved_at": null
+    },
+    {
+      "id": 13,
+      "title": "se daño la vida",
+      "description": "se daño",
+      "status": "Resuelto",
+      "severity": "Alta",
+      "specialty": "General",
+      "tenant_id": 6,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 1,
+      "resolved_at": null
+    },
+    {
+      "id": 14,
+      "title": "La cocina no enciende",
+      "description": "No enciende la cocina",
+      "status": "Resuelto",
+      "severity": "Alta",
+      "specialty": "General",
+      "tenant_id": 7,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 2,
+      "resolved_at": "2026-06-04 15:21:48.733087"
+    },
+    {
+      "id": 15,
+      "title": "La cocina se le rompio la toma de gas",
+      "description": "No hay gas en la cocina",
+      "status": "Resuelto",
+      "severity": "Alta",
+      "specialty": "General",
+      "tenant_id": 7,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 2,
+      "resolved_at": "2026-06-04 15:22:06.568945"
+    },
+    {
+      "id": 16,
+      "title": "La cocina se daño",
+      "description": "La cocina solo le funciona el horno",
+      "status": "Resuelto",
+      "severity": "Alta",
+      "specialty": "General",
+      "tenant_id": 7,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 2,
+      "resolved_at": "2026-06-05 10:52:01.128075"
+    },
+    {
+      "id": 17,
+      "title": "Cocina con fuga",
+      "description": "La cocina tiene una fuga de gas",
+      "status": "Resuelto",
+      "severity": "Alta",
+      "specialty": "General",
+      "tenant_id": 6,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 2,
+      "resolved_at": "2026-06-05 10:43:39.801806"
+    },
+    {
+      "id": 18,
+      "title": "Fuga de agua ",
+      "description": "fuga de agua ",
+      "status": "Resuelto",
+      "severity": null,
+      "specialty": null,
+      "tenant_id": 7,
+      "property_id": 1,
+      "technician_id": null,
+      "asset_id": 3,
+      "resolved_at": "2026-06-05 10:50:59.521873"
+    },
+    {
+      "id": 19,
+      "title": "Fuga de gas",
+      "description": "Fuga de gas en la cocina",
+      "status": "Resuelto",
+      "severity": "Baja",
+      "specialty": "Plomeria",
+      "tenant_id": 6,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 2,
+      "resolved_at": "2026-06-05 10:56:48.627378"
+    },
+    {
+      "id": 20,
+      "title": "Hay humedades",
+      "description": "humedades en la pared de la cocina",
+      "status": "Resuelto",
+      "severity": null,
+      "specialty": null,
+      "tenant_id": 6,
+      "property_id": 1,
+      "technician_id": null,
+      "asset_id": 2,
+      "resolved_at": "2026-06-05 10:58:07.405171"
+    },
+    {
+      "id": 21,
+      "title": "Fuga de gas en la cocina",
+      "description": "Fuga de gas masiva",
+      "status": "Resuelto",
+      "severity": null,
+      "specialty": "General",
+      "tenant_id": 6,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 2,
+      "resolved_at": "2026-06-05 13:01:38.796528"
+    },
+    {
+      "id": 22,
+      "title": "Tuberia rota",
+      "description": "Se rompió la tuberia ",
+      "status": "En progreso",
+      "severity": null,
+      "specialty": null,
+      "tenant_id": 7,
+      "property_id": 1,
+      "technician_id": null,
+      "asset_id": 2,
+      "resolved_at": null
+    },
+    {
+      "id": 23,
+      "title": "Fuga de agua en la cocina",
+      "description": "La cocina tiene una fuga de agua ",
+      "status": "Pendiente",
+      "severity": "Media",
+      "specialty": "Electricidad",
+      "tenant_id": 6,
+      "property_id": 1,
+      "technician_id": 4,
+      "asset_id": 2,
+      "resolved_at": null
+    },
+    {
+      "id": 24,
+      "title": "Fuga de agua",
+      "description": "Fuga de agua en la cocina",
+      "status": "Pendiente",
+      "severity": null,
+      "specialty": null,
+      "tenant_id": 6,
+      "property_id": 1,
+      "technician_id": null,
+      "asset_id": 2,
+      "resolved_at": null
+    }
+  ]
+}
