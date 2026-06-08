@@ -8,14 +8,7 @@ import { BackendURL } from './components/BackendURL';
 
 const Main = () => {
     
-    if(!import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_BACKEND_URL === "") {
-        return (
-            <React.StrictMode>
-                <BackendURL />
-            </React.StrictMode>
-        );
-    }
-    
+    // Removed VITE_BACKEND_URL block for monolithic deployment
     return (
         <React.StrictMode>  
             <StoreProvider> 

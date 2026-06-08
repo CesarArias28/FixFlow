@@ -7,7 +7,7 @@ export const ForgotPassword = () => {
     const [message, setMessage] = useState({ type: "", text: "" });
     const [resetLink, setResetLink] = useState("");
     const [resetStep, setResetStep] = useState(1);
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
     const handleSendEmail = async (e) => {
         e.preventDefault();

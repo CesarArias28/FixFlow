@@ -12,7 +12,7 @@ export const ClientDashboard = () => {
     const [incidences, setIncidences] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
     useEffect(() => {
         if (!store.token) {

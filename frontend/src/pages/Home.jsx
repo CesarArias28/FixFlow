@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export const Home = () => {
 	const { store } = useGlobalReducer();
-	const backendUrl = import.meta.env.VITE_BACKEND_URL;
+	const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
 	const getDashboardPath = () => {
 		if (store.role === "inquilino") return "/client-dashboard";

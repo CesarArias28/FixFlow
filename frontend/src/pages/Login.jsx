@@ -15,7 +15,7 @@ export const Login = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
     const handleSubmit = async (e) => {
         e.preventDefault();

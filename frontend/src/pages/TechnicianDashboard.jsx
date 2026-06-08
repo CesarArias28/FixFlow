@@ -9,7 +9,7 @@ export const TechnicianDashboard = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const techId = store.userId;
 
     const fetchAssignedIncidences = async () => {
@@ -32,7 +32,7 @@ export const TechnicianDashboard = () => {
     };
 
     useEffect(() => {
-        if (backendUrl && techId) {
+        if (techId) {
             fetchAssignedIncidences();
         }
     }, [techId, backendUrl]);

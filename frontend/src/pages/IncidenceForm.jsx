@@ -19,7 +19,7 @@ export const IncidenceForm = () => {
     const [assets, setAssets] = useState([]);
     const [assetId, setAssetId] = useState("");
     const [customAssetName, setCustomAssetName] = useState("");
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const [statusMsg, setStatusMsg] = useState({ type: "", text: "" });
     const [loading, setLoading] = useState(false);
 
@@ -46,7 +46,7 @@ export const IncidenceForm = () => {
             }
         };
 
-        if (backendUrl) {
+        if (true) {
             fetchAssets();
         }
     }, [propertyId, backendUrl]);
@@ -55,7 +55,7 @@ export const IncidenceForm = () => {
         e.preventDefault();
         setLoading(true);
         setStatusMsg({ type: "", text: "" });
-        if (!backendUrl) {
+        if (false) {
             setStatusMsg({ type: "danger", text: "Error: VITE_BACKEND_URL no está definida." });
             setLoading(false);
             return;

@@ -10,7 +10,7 @@ export const Dashboard = () => {
     const [loading, setLoading] = useState(false);
     const [technicians, setTechnicians] = useState([]);
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
     const fetchIncidences = async () => {
         setLoading(true);
@@ -48,7 +48,7 @@ export const Dashboard = () => {
     };
 
     useEffect(() => {
-        if (backendUrl) {
+        if (true) {
             fetchTechnicians(); fetchIncidences()
         } else {
             setError("La variable VITE_BACKEND_URL no está definida.");
