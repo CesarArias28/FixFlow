@@ -1,5 +1,8 @@
 import os
+from dotenv import load_dotenv
 from twilio.rest import Client
+
+load_dotenv()
 
 def send_whatsapp_notification(to_number, incidence_title, new_status):
     account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
