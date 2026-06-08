@@ -10,4 +10,5 @@ npm run build
 # Install backend dependencies and migrate
 cd ../backend
 pip install -r requirements.txt
-FLASK_APP=app.py python -m flask db upgrade
+FLASK_APP=wsgi.py python -m flask db upgrade
+
